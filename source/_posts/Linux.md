@@ -55,33 +55,119 @@ vmlinuz initrd=initrd.img inst.stage2=hd:/dev/sdb4 quiet   ps：/dev/sdb4就是�
 
 ### partions使用xfs分区,sda没有足够的空间写入core.img   
 如果选则不创建grub引导，则会跳过此布异常，但是开机后会直接进入windows需要在windows下创建Cent OS引导项...
-<!--谜之操作: 存在一次安装时，成功:将/biosboot 分区挂载到C盘，其他分区不用管。安装完成后，可以启动Linux但是Windows引导项被覆盖，无法进入windows -->   
+<!--谜之操作: 存在一次安装时，成功:将/biosboot, /boot分区挂载到C盘，其他分区不用管，**并将引导项装入C盘**，安装完成后，可以启动Linux但是Windows引导项被覆盖，无法进入windows -->   
 
-### ~~Cent OS下无法连接wifi~~
+### ~~Cent OS下无法连接wifi(无线网卡：rtl8822be)~~
 No Adapter   
-参照[rtlwifi](https://github.com/lwfinger/rtlwifi_new),编译失败   
+参照[rtlwifi_new](https://github.com/lwfinger/rtlwifi_new)  [rtlwifi_next](https://github.com/rtlwifi-linux/rtlwifi-next.git),编译失败   
 怀疑：`This code will build on any kernel 4.2 and newer as long as the distro has not modified any of the kernel APIs.`    
-刚安装Cent OS 7.6 内核版本3.X  
+刚安装Cent OS 7.6 内核版本3.1  
 
 没有有线网，没有wifi，一台笔记本 jj ... ...
 
+....
+
+升级内核5.1后     
+[rtlwifi_new](https://github.com/lwfinger/rtlwifi_new.git)编译成功,成功安装
+```sh
+sudo modprobe -r rtl8822be
+sudo modprobe rtl8822be
+```
+执行到此处时，出错
+modprobe ...
+
+```
+lspci | grep Wireless
+```
+无显示
+
+
+
 ### ~~修复windows引导项~~   
 编辑`/boot/grub2/grub.cfg`文件   
-```
+```sh
 menuentry "Windows 10" {
-    insmod part_msdos
+    insmod part_msdos  //mdr分区
     insmod ntfs
     set root='(hd0,msdos1)'
     chainloader +1    
 }
 ```   
-大致解释下，hd0 代表 Windows 系统所在的硬盘，msdos1 代表 Windows 系统所在的分区。需要注意的是，Grub 对所有硬盘的分类都表示为 hd，但现在 Linux 系统大多为 Grub2 引导，Grub2 对磁盘的分类更加详细。
-磁盘分类可能表示为 hd 、sd ，其中 hd0 表示第一块磁盘， hd1 表示第二块... 依此类推。对于 sd 则有所不同，sda 表示第一块磁盘，sdb 表示第二块... 依此类推。
-Linux 中通过 `df -TH` 命令可以查看硬盘的具体信息，比如你的 Windows 系统所在的硬盘为 sdb4，则代表是第二块硬盘的第四分区，代码表示为 '(sd1,msdos4)'
+~~大致解释下，hd0 代表 Windows 系统所在的硬盘，msdos1 代表 Windows 系统所在的分区。需要注意的是，Grub 对所有硬盘的分类都表示为 hd，但现在 Linux 系统大多为 Grub2 引导，Grub2 对磁盘的分类更加详细。~~      
+~~磁盘分类可能表示为 hd 、sd ，其中 hd0 表示第一块磁盘， hd1 表示第二块... 依此类推。对于 sd 则有所不同，sda 表示第一块磁盘，sdb 表示第二块... 依此类推。~~    
+~~Linux 中通过 `df -TH` 命令可以查看硬盘的具体信息，比如你的 Windows 系统所在的硬盘为 sdb4，则代表是第二块硬盘的第四分区，代码表示为 '(sd1,msdos4)'~~        
+在grub中`list -l` 打印...  
 
-具体hd序号什么的,不明其意。尝试多次，失败告终...    
+#### ~~进入Cent OS前~~
+进入系统前"press C for commandline"--&gt;grub  
+```sh
+grub>ls -l
 
-<!-- WinPE 修复引导项失败，重装系统... -->   
+list partions: (hd0,gpt2)
 
+grub>insmod part_gpt
+grub>insmod ntfs
+grub>set root='hd0,gpt2'
+grub>chainloader EFI/Miscrosoft/Boot/zh-CN/bootmgfw.efi
+
+//invalid file
+
+grub>chainloader EFI/Boot/bootx64.efi
+
+//invalid file
+
+grub>boot
+```
+#### ~~进入Cent OS后~~
+```sh
+#gedit /boot/grub2/grub.cfg
+
+menuentry "Windows 10" {
+  insmod part_gpt
+  insmod ntfs
+  set root='hd0,gpt2'
+  chainloader +1
+}
+
+#reboot
+```
+
+尝试多次，失败告终...    
+
+<!-- WinPE 修复引导项失败，重装系统... -->  
+<!-- Windows 10重装UEFI -- GPT;BIOS -- MBR(Secure Boot: disable;Fast Boot: disable;Prefered OS: disable;). -->
+<!-- EFI partitions: efi, msr, primary -->
+<!-- shift+f10 : commandline : diskpart  , help, list, sel, clean, convert gpt/mbr, create partition xxxx size=xxxx etc.  -->
 惨败收场
 --
+
+
+### 内核升级
+#### 配置源
+```sh
+# restore old yum mirrors
+cd /etc/yum.repos.d/
+mkdir repo_bak
+mv *.repo repo_bak/
+# 在CentOS中配置使用网易和阿里的开源镜像
+wget http://mirrors.aliyun.com/repo/Centos-7.repo -o /etc/yum.repos.d/aliyun.repo
+wget http://mirrors.163.com/.help/CentOS7-Base-163.repo -o /etc/yum.repos.d/163.repo
+# 清理系统缓存
+yum clean all
+# 生成yum缓存
+yum makecache
+# 安装epel源
+yum list | grep epel-release
+yum install -y epel-release
+# 使用阿里开源镜像提供的epel源
+wget -O /etc/yum.repos.d/epel-7.repo http://mirrors.aliyun.com/repo/epel-7.repo    # 下载阿里开源镜像的epel源文件
+# 清理系统缓存
+yum clean all
+# 生成yum缓存
+yum makecache
+# 查看系统可用的yum源和所有的yum源
+yum repolist enabled
+yum repolist all
+```
+#### 内核升级
+参考[centos 手动升级系统内核](https://blog.csdn.net/u010654572/article/details/51755465)   
