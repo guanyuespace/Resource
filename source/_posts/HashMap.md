@@ -24,7 +24,7 @@ This class makes no guarantees as to the order of the map; in particular, it doe
 ```java
 public abstract class AbstractMap<K,V> implements Map<K,V>
 ```
-- To implement an unmodifiable map, the programmer needs only to extend this class and provide an implementation for the <tt>entrySet</tt> method, which returns a set-view of the map's mappings.  Typically, the returned set will, in turn, be implemented atop <tt>AbstractSet</tt>.  This set should not support the <tt>add</tt> or <tt>remove</tt> methods, and its iterator should not support the <tt>remove</tt> method.
+- To implement an unmodifiable map, the programmer needs only to extend this class and provide an implementation for the <tt>entrySet</tt> method, which returns a set-view of the map's mappings.  Typically, the returned set will, in turn, be implemented atop <tt>AbstractSet</tt>.  This set should not support the <tt>add</tt> or <tt>remove</tt> methods, and its iterator should not support the <tt>remove</tt> method.（实现不可变的Map只需实现entrySet方法，并且返回Set和其Iterator不能实现add与remove方法）
 
 - To implement a modifiable map, the programmer must additionally override this class's <tt>put</tt> method (which otherwise throws an <tt>UnsupportedOperationException</tt>), and the iterator returned by <tt>entrySet().iterator()</tt> must additionally implement its <tt>remove</tt> method.
 > unmodifiable: `entrySet()`   
@@ -39,12 +39,15 @@ public abstract class AbstractMap<K,V> implements Map<K,V> {
     public int size() {
         return entrySet().size();
     }
+    //没有给出实现
+    public abstract Set<Entry<K,V>> entrySet();
+
     public boolean containsKey(Object key) {
         Iterator<Map.Entry<K,V>> i = entrySet().iterator();
         if (key==null) {
             while (i.hasNext()) {
                 Entry<K,V> e = i.next();
-                if (e.getKey()==null)
+                if (e.getKey()==null)//可以包含null作为key
                     return true;
             }
         } else {
@@ -61,13 +64,13 @@ public abstract class AbstractMap<K,V> implements Map<K,V> {
     public V remove(Object key) {
         Iterator<Entry<K,V>> i = entrySet().iterator();
         Entry<K,V> correctEntry = null;
-        if (key==null) {
+        if (key==null) {//remove key:null
             while (correctEntry==null && i.hasNext()) {
                 Entry<K,V> e = i.next();
                 if (e.getKey()==null)
                     correctEntry = e;
             }
-        } else {
+        } else {//
             while (correctEntry==null && i.hasNext()) {
                 Entry<K,V> e = i.next();
                 if (key.equals(e.getKey()))
@@ -82,26 +85,45 @@ public abstract class AbstractMap<K,V> implements Map<K,V> {
         }
         return oldValue;
     }
+    //Entry：Map项
+    public static class SimpleEntry<K,V>
+        implements Entry<K,V>, java.io.Serializable{
+          public V setValue(V value) {
+              V oldValue = this.value;
+              this.value = value;
+              return oldValue;
+          }
+    }
+    //Immutable： 不可变的
+    public static class SimpleImmutableEntry<K,V>
+        implements Entry<K,V>, java.io.Serializable{
+          public V setValue(V value) {
+              throw new UnsupportedOperationException();
+          }
+    }
+
 }
 ```
+实现交由entrySet.Iterator完成，而entrySet没有给出实现，需要子类提供实现
 # HashMap
 > `initial capacity` and `load factor`   
 > multi-threads modify the `map structure`  -->  synchronized
 
 This implementation provides constant-time performance for the basic operations (<tt>get</tt> and <tt>put</tt>), assuming the hash function disperses the elements properly among the buckets.(在key均匀分布时才有查询时间O(n))     
-Iteration over collection views requires time proportional to the "capacity" of the <tt>HashMap</tt> instance (the number of buckets) plus its size (the number of key-value mappings).(集合迭代需要与capacity等比例的时间);Thus, it's very important **not to set the initial capacity too high (or the load factor too low) **if iteration performance is important.     
+Iteration over collection views requires time proportional to the "capacity" of the <tt>HashMap</tt> instance (the number of buckets) plus its size (the number of key-value mappings).(集合迭代需要与capacity等比例的时间);Thus, it's very important **not to set the initial capacity too high (or the load factor too low) ** if iteration performance is important.     
 
-- An instance of <tt>HashMap</tt> has two parameters that affect its performance: <i>initial capacity</i> and <i>load factor</i>.  
+- An instance of <tt>HashMap</tt> has two parameters that affect its performance: <b>initial capacity</b> and <b>load factor</b>.  
 
- - The <i>capacity</i> is the number of buckets in the hash table, and the initial capacity is simply the capacity at the time the hash table is created.     
- - The <i>load factor</i> is a measure of how full the hash table is allowed to get before its capacity is automatically increased.     
+ - The <b>capacity</b> is the number of buckets in the hash table, and the initial capacity is simply the capacity at the time the hash table is created.     
+ - The <b>load factor</b> is a measure of how full the hash table is allowed to get before its capacity is automatically increased.     
 
    **When the number of entries in the hash table exceeds the product of the load factor and the current capacity, the hash table is <i>rehashed</i> (that is, internal data structures are rebuilt) so that the hash table has approximately twice the number of buckets.**  
 
-- If many mappings are to be stored in a <tt>HashMap</tt> instance, creating it with a sufficiently large capacity will allow the mappings to be stored more efficiently than letting it perform automatic rehashing as needed to grow the table.    
+- **If many mappings are to be stored in a <tt>HashMap</tt> instance, creating it with a sufficiently large capacity will allow the mappings to be stored more efficiently than letting it perform automatic rehashing as needed to grow the table.**        
  - Note that using many keys with the same {@code hashCode()} is a sure way to slow down performance of any hash table.
  - To ameliorate impact, when keys are {@link Comparable}, this class may use comparison order among keys to help break ties.
 
+#### modified structurally(Exception)
 ```java
 If no such object exists, the map should be "wrapped" using the {@link Collections#synchronizedMap Collections.synchronizedMap} method.  
 
@@ -110,13 +132,12 @@ This is best done at creation time, to prevent accidental unsynchronized access 
 Map m = Collections.synchronizedMap(new HashMap(...));
 ```
 ## code
-### Abstract
+### Abstract(简介)
 ```java
 public class HashMap<K,V> extends AbstractMap<K,V>
     implements Map<K,V>, Cloneable, Serializable {
       static final int DEFAULT_INITIAL_CAPACITY = 1 << 4; // aka 16
       static final float DEFAULT_LOAD_FACTOR = 0.75f;
-
       final float loadFactor;
       // The next size value at which to resize (capacity * load factor).
       // (The javadoc description is true upon serialization.
@@ -124,11 +145,8 @@ public class HashMap<K,V> extends AbstractMap<K,V>
       // field holds the initial array capacity, or zero signifying
       // DEFAULT_INITIAL_CAPACITY.)
       int threshold;//阈值
-
       transient int modCount;//---expectedModCount  :   Modification Exception
-
       transient Node<K,V>[] table;//store values ---> table[]  index: hashCode&capacity-1
-
       public HashMap(int initialCapacity, float loadFactor) {
           if (initialCapacity < 0)
               throw new IllegalArgumentException("Illegal initial capacity: " +
@@ -141,18 +159,21 @@ public class HashMap<K,V> extends AbstractMap<K,V>
           this.loadFactor = loadFactor;
           this.threshold = tableSizeFor(initialCapacity);
       }
+      //找到大于initialCapacity最小的2^n
+      //tableSizeFor(100)=128;  tableSizeFor(65536)=65536; tableSizeFor(65537)=131072   
       static final int tableSizeFor(int cap) {
         int n = cap - 1;//最低位1右移一位
-        n |= n >>> 1;//无符号右移，高位补0   +0.5     （|= 类比加）
+        n |= n >>> 1;//无符号右移，高位补0   +0.5     （|= 类比 加）
         n |= n >>> 2;//                    +0.25
         n |= n >>> 4;//                    +0.125
         n |= n >>> 8;//                    +0.0625
         n |= n >>> 16;//                   +0.03125
         return (n < 0) ? 1 : (n >= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
     }//运算结果： ？？ 1.75*cap
+    //int： 32位   （右移1,2,4,8,16使得所有位均为1，later+1 ok-->最小的2^n）
 }
 ```
-### Node-Iterator
+### Node-Iterator(entrySet method)
 ```java
 static class Node<K,V> implements Map.Entry<K,V> {
     final int hash;
@@ -167,8 +188,7 @@ static class Node<K,V> implements Map.Entry<K,V> {
     }
 }
 
-// Tree bins
-
+// Tree bins (后续分析。。。)
 /**
  * Entry for Tree bins. Extends LinkedHashMap.Entry (which in turn
  * extends Node) so can be used as extension of either regular or
@@ -193,8 +213,7 @@ static final class TreeNode<K,V> extends LinkedHashMap.Entry<K,V> {
     }
     .....
 }
-
-
+///////HashMap#entrySet方法/////////////
 public Set<Map.Entry<K,V>> entrySet() {
     Set<Map.Entry<K,V>> es;
     return (es = entrySet) == null ? (entrySet = new EntrySet()) : es;
@@ -228,7 +247,7 @@ final class EntrySet extends AbstractSet<Map.Entry<K,V>> {
     public final Iterator<Map.Entry<K,V>> iterator() {
         return new EntryIterator();
     }
-    //remove Entry:key=o
+    //remove Entry:o
     public final boolean remove(Object o) {
         if (o instanceof Map.Entry) {
             Map.Entry<?,?> e = (Map.Entry<?,?>) o;
@@ -240,12 +259,16 @@ final class EntrySet extends AbstractSet<Map.Entry<K,V>> {
     }
 }
 ```
-数据存储在table中 index: hash&(capacity-1) ; modify structurally: pay attention to the expectedModCount & modCount
-***LinkedHashMap 与 TreeNode相关后续介绍***
+数据存储在table中 index: hash&(capacity-1) ; modify structurally: pay attention to the expectedModCount & modCount    
+***LinkedHashMap 与 TreeNode相关后续介绍***     
+在EntrySet中仅有remove方法 --> HashMap#removeNode
+
 
 ### Put--Remove
+>put()与remove()方法具体实现交由putVal()和removeNode()
+
 ```java
-//初始化&空间不够时，重建table
+//初始化&空间不够时，重建table[扩容]
 final Node<K,V>[] resize() {
     Node<K,V>[] oldTab = table;
     int oldCap = (oldTab == null) ? 0 : oldTab.length;
@@ -266,37 +289,78 @@ final Node<K,V>[] resize() {
         newCap = DEFAULT_INITIAL_CAPACITY;//初始空间 10
         newThr = (int)(DEFAULT_LOAD_FACTOR * DEFAULT_INITIAL_CAPACITY);//10*0.75
     }
-    if (newThr == 0) {//why here ?
+    if (newThr == 0) {// oldThr>0
         float ft = (float)newCap * loadFactor;
         newThr = (newCap < MAXIMUM_CAPACITY && ft < (float)MAXIMUM_CAPACITY ?
                   (int)ft : Integer.MAX_VALUE);
     }
     threshold = newThr;//阈值更新
     @SuppressWarnings({"rawtypes","unchecked"})
-        Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap];//新建table
+    Node<K,V>[] newTab = (Node<K,V>[])new Node[newCap];//新建table
     table = newTab;
     if (oldTab != null) {//旧值拷贝（new index=hash * newCapacity）
         for (int j = 0; j < oldCap; ++j) {
             Node<K,V> e;
             if ((e = oldTab[j]) != null) {//旧值e
                 oldTab[j] = null;
-                if (e.next == null)//only e
+                if (e.next == null)//bucket：e --- next链表中不存在其他元素
                     newTab[e.hash & (newCap - 1)] = e;
-                else if (e instanceof TreeNode)
+                else if (e instanceof TreeNode)//bucket: e --- TreeNode.......
                     ((TreeNode<K,V>)e).split(this, newTab, j, oldCap);
-                else { // preserve order : order   
-                    Node<K,V> loHead = null, loTail = null;
-                    Node<K,V> hiHead = null, hiTail = null;
+                else {// bucket: e --- next链表...   
+                      // 进行链表复制
+						          // 方法比较特殊： 它并没有重新计算元素在数组中的位置
+						          // 而是采用了 原始位置:j加原数组长度:oldCap的方法计算得到位置
+                    Node<K,V> loHead = null, loTail = null;//位置不变
+                    Node<K,V> hiHead = null, hiTail = null;//位置改变
                     Node<K,V> next;
                     do {//构建链表存储(同一hash值)
+                        /*********************************************/
+                        /**
+                        * 注: e本身就是一个链表的节点，它有自身的值和next(链表的值)，但是因为next值对节点扩容没有帮助，
+                        * 所有在下面讨论中，我近似认为 e是一个只有自身值，而没有next值的元素。
+                        */
+                        /*********************************************/
                         next = e.next;
-                        if ((e.hash & oldCap) == 0) {//index: hash & oldCap-1 ; (e.hash & oldCap) ???
+                        // 注意：不是(e.hash & (oldCap-1));而是(e.hash & oldCap)
+
+          							// (e.hash & oldCap) 得到的是 元素的在数组中的位置是否需要移动,示例如下
+
+          							// 示例1：
+          							// e.hash=10 0000 1010
+          							// oldCap=16 0001 0000
+          							//	 &   =0	 0000 0000       比较高位的第一位 0
+          							//结论：元素位置在扩容后数组中的位置没有发生改变
+          							// 示例2：
+          							// e.hash=17 0001 0001
+          							// oldCap=16 0001 0000
+          							//	 &   =1	 0001 0000      比较高位的第一位   1
+          							//结论：元素位置在扩容后数组中的位置发生了改变，新的下标位置是原下标位置+原数组长度
+
+                        // (e.hash & (oldCap-1))旧位置（old Index）
+                      	// (e.hash & (oldCap-1)) 得到的是下标位置,示例如下
+          							//   e.hash=10 0000 1010
+          							// oldCap-1=15 0000 1111
+          							//      &  =10 0000 1010
+          							//   e.hash=17 0001 0001
+          							// oldCap-1=15 0000 1111
+          							//      &  =1  0000 0001
+
+          							//新下标位置
+          							//   e.hash=17 0001 0001
+          							// newCap-1=31 0001 1111    newCap=32
+          							//      &  =17 0001 0001    1+oldCap = 1+16
+
+          							//元素在重新计算hash之后，因为n变为2倍，那么n-1的mask范围在高位多1bit(红色)，因此新的index就会发生这样的变化：
+          							//参考博文：[Java8的HashMap详解](https://blog.csdn.net/login_sonata/article/details/76598675)  
+          							// 0000 0001->0001 0001
+                        if ((e.hash & oldCap) == 0) {//(e.hash & oldCap)==0  不需要改变位置
                             if (loTail == null)
                                 loHead = e;
                             else
                                 loTail.next = e;
                             loTail = e;
-                        }else {
+                        }else {//需要改变位置  。。。   
                             if (hiTail == null)
                                 hiHead = e;
                             else
@@ -330,7 +394,7 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
         Node<K,V> e; K k;
         if (p.hash == hash &&
             ((k = p.key) == key || (key != null && key.equals(k))))//Node: e-current bucket head(just have inserted ...)
-            e = p;
+            e = p;//重复
         else if (p instanceof TreeNode)//TreeNode
             e = ((TreeNode<K,V>)p).putTreeVal(this, tab, hash, key, value);
         else {//tab[(n-1)&hash]  != 当前。。。   hash碰撞...
@@ -358,11 +422,11 @@ final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
     }
     ++modCount;//modCount & expectedModCount
     if (++size > threshold)
-        resize();//重构
+        resize();//重构,扩容
     afterNodeInsertion(evict);//LinkedHashMap-callback  
     return null;
 }
-//
+//remove Node
 final Node<K,V> removeNode(int hash, Object key, Object value,
                            boolean matchValue, boolean movable) {
     Node<K,V>[] tab; Node<K,V> p; int n, index;
@@ -375,7 +439,7 @@ final Node<K,V> removeNode(int hash, Object key, Object value,
         else if ((e = p.next) != null) {//find in 链表
             if (p instanceof TreeNode)//...
                 node = ((TreeNode<K,V>)p).getTreeNode(hash, key);
-            else {
+            else {//链表中。。。
                 do {
                     if (e.hash == hash &&
                         ((k = e.key) == key ||
@@ -404,5 +468,8 @@ final Node<K,V> removeNode(int hash, Object key, Object value,
     return null;
 }
 ```
-
+关于扩容，链表元素：[深入解析HashMap原理（基于JDK1.8）](https://blog.csdn.net/qq_37113604/article/details/81353626)     
+避免不必要的扩容:     
+假设要存储1000个     
+设1024 but 1024*0.75&lt;1000  : so  set  2048   
 ....

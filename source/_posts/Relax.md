@@ -9,7 +9,8 @@ tags:
 ---
 
 # 相对路径引用的标签插件    
-```
+<!-- config.yml  post_asset_folder: true  -->
+```MarkDown
 {% asset_img bd_logo.png just for fun ! %}  
 ![just for fun](bd_logo.png "just for fun !")    
 ```

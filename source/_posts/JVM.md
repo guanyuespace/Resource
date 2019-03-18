@@ -29,8 +29,8 @@ tags:
 
 
 
-![对象的访问定位-通过句柄访问](https://user-gold-cdn.xitu.io/2017/9/4/ebf00ed26c35aefd93d5a3a36b3b1613?imageView2/0/w/1280/h/960/format/webp/ignore-error/1 "对象的访问定位-通过句柄访问")    
-![对象的访问定位-通过句柄访问](https://user-gold-cdn.xitu.io/2017/9/4/de6924b6e9d576105ba24700f1f357f4?imageView2/0/w/1280/h/960/format/webp/ignore-error/1 "对象的访问定位-通过句柄访问")   
+![对象的访问定位-通过句柄访问](https://user-gold-cdn.xitu.io/2017/9/4/ebf00ed26c35aefd93d5a3a36b3b1613 "对象的访问定位-通过句柄访问")    
+![对象的访问定位-通过句柄访问](https://user-gold-cdn.xitu.io/2017/9/4/de6924b6e9d576105ba24700f1f357f4 "对象的访问定位-通过句柄访问")   
 比较：使用句柄的最大好处是 `reference` 中存储的是稳定的句柄地址，在对象移动(GC)时只改变实例数据指针地址，`reference` 自身不需要修改。直接指针访问的最大好处是速度快，节省了一次指针定位的时间开销。如果是对象频繁 `GC` 那么句柄方法好，如果是对象频繁访问则直接指针访问好。
 
 ....
@@ -121,11 +121,11 @@ java内存运行时, 程序计数器, 虚拟机栈, 本地方法栈3个区域随
 原理: 给对象添加一个引用计数器, 每当有一个地方引用它时, 计数器加一, 当引用失效时, 引用就减一. 任何时刻计数器都为0的对象就是不可使用的.         
 优点: **实现简单, 判定效率高.**   
 缺点: **很难解决对象之间的循环引用的问题.(两个对象相互引用)**    
-![两个对象相互引用](https://user-gold-cdn.xitu.io/2017/9/4/4c289a224cb4944e499fb5bfd33e592f?imageView2/0/w/1280/h/960/format/webp/ignore-error/1 "两个对象相互引用")    
+![两个对象相互引用](https://user-gold-cdn.xitu.io/2017/9/4/4c289a224cb4944e499fb5bfd33e592f "两个对象相互引用")    
 从图中可以看出，如果不下小心直接把 Obj1-reference 和 Obj2-reference 置 null。则在 Java 堆当中的两块内存依然保持着互相引用无法回收。
 2. 可达性分析算法    
 原理: 通过一系列的成为"GC Roots"的对象作为起始点, 从这些节点开始向下搜索, 搜索所走过的路径称为引用链(Reference Chain), 当一个对象到GC Roots没有任何引用链(图论中称为从GC Roots到这个对象不可达)时, 证明此对象是不可达的.    
-![](https://user-gold-cdn.xitu.io/2017/9/4/58bfac15ca6d3076def5174ed5ca5a99?imageView2/0/w/1280/h/960/format/webp/ignore-error/1 "可达性分析法")        
+![](https://user-gold-cdn.xitu.io/2017/9/4/58bfac15ca6d3076def5174ed5ca5a99 "可达性分析法")        
 可作为 GC Roots 的对象：   
   - 虚拟机栈(栈帧中的本地变量表)中引用的对象
   - 方法区中类静态属性引用的对象

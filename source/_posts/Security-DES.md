@@ -51,8 +51,8 @@ DES ECB（电子密本方式）其实非常简单，就是将数据按照8个字
  加密消息块相互独立成为被攻击的弱点/weakness due to encrypted message blocks being independent
 
 2. CBC(Cipher Block Chaining)/密文分组链接方式(**双方约定初始向量：IV**)
-![CBC-加密](https://img-blog.csdn.net/20160405180943506?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center "CBC-加密")  
-![CBC-解密](https://img-blog.csdn.net/20160405180951038?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center "CBC-解密")
+![CBC-加密](https://img-blog.csdn.net/20160405180943506 "CBC-加密")  
+![CBC-解密](https://img-blog.csdn.net/20160405180951038 "CBC-解密")
 特点：  
  1. 不容易主动攻击,安全性好于ECB,适合传输长度长的报文,是SSL、IPSec的标准。  
  each ciphertext block depends on all message blocks/每个密文块依赖于所有的信息块  
@@ -66,14 +66,14 @@ CFB模式与OFB模式不需要填充
 ---
 
 3. Cipher Feedback (CFB)/密文反馈模式(**双方约定初始向量：IV---Shift register移位寄存器，每次加密位数：移位寄存器位数**)  
-![CFB-加密](https://img-blog.csdn.net/20160405181228492?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center "CFB-加密")    
-![CFB-解密](https://www.baidu.com/ "CFB-解密")      
+![CFB-加密](https://img-blog.csdn.net/20160405181228492 "CFB-加密")    
+![CFB-解密]( "CFB-解密")      
 密文反馈（CFB，Cipher feedback）模式类似于CBC，可以将块密码变为自同步的流密码；工作过程亦非常相似，CFB的解密过程几乎就是颠倒的CBC的加密过程。
 加密过程：**需要使用一个与块的大小相同的移位寄存器，并用IV将寄存器初始化。**然后，将寄存器内容使用块密码加密，然后将结果的最高x位与明文的x进行异或，以产生密文的x位。下一步将生成的x位密文移入寄存器中，并对下面的x位明文重复这一过程。解密过程与加密过程相似，以IV开始，对寄存器加密，将结果的高x与密文异或，产生x位明文，再将密文的下面x位移入寄存器。
 与CBC相似，**明文的改变会影响接下来所有的密文**，因此**加密过程不能并行化；**而同样的，与CBC类似**，解密过程是可以并行化的。**
 
 4. Output Feedback (OFB)/输出反馈模式
-![OFB-加密](https://img-blog.csdn.net/20160405181324195?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQv/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/Center "OFB-加密")   
+![OFB-加密](https://img-blog.csdn.net/20160405181324195 "OFB-加密")   
 输出反馈模式（Output feedback, OFB）可以将块密码变成同步的流密码。它产生密钥流的块，然后将其与明文块进行异或，得到密文。与其它流密码一样，密文中一个位的翻转会使明文中同样位置的位也产生翻转。这种特性使得许多错误校正码，例如奇偶校验位，即使在加密前计算而在加密后进行校验也可以得出正确结果。    
 每个使用OFB的输出块与其前面所有的输出块相关，因此**不能并行化处理(加密&解密)**。然而，由于明文和密文只在最终的异或过程中使用，因此可以事先对IV进行加密，最后并行的将明文或密文进行并行的异或处理。
 可以利用输入全0的CBC模式产生OFB模式的密钥流。这种方法十分实用，因为可以利用快速的CBC硬件实现来加速OFB模式的加密过程。
@@ -85,11 +85,11 @@ CFB模式与OFB模式不需要填充
 > **不需要初始化向量 **   
 > **不需要填充 **     
 > 这里我们有必要给出CTR模式的加密流程，因为CTR模式的解密和加密是一模一样的过程，在程序实现中也是可逆的   
-> ![CTR加密](https://img-blog.csdnimg.cn/2018110314132228.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Mjk0MDgyNg==,size_16,color_FFFFFF,t_70 "CTR加密")  
+> ![CTR加密](https://img-blog.csdnimg.cn/2018110314132228.png "CTR加密")  
 > CTR加密即解密，解密即加密，且各分组之间是独立的，可以并发完成，效率高。  
 
 小节：  
-![加密模式比较](https://img-blog.csdnimg.cn/20181103140304845.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80Mjk0MDgyNg==,size_16,color_FFFFFF,t_70 "加密模式比较")
+![加密模式比较](https://img-blog.csdnimg.cn/20181103140304845.png "加密模式比较")
 
 
 ### 数据填充
