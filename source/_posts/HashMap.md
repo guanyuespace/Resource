@@ -159,6 +159,8 @@ public class HashMap<K,V> extends AbstractMap<K,V>
           this.loadFactor = loadFactor;
           this.threshold = tableSizeFor(initialCapacity);
       }
+      //找到大于initialCapacity最小的2^n
+      //tableSizeFor(100)=128;  tableSizeFor(65536)=65536; tableSizeFor(65537)=131072   
       static final int tableSizeFor(int cap) {
         int n = cap - 1;//最低位1右移一位
         n |= n >>> 1;//无符号右移，高位补0   +0.5     （|= 类比 加）
@@ -168,6 +170,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
         n |= n >>> 16;//                   +0.03125
         return (n < 0) ? 1 : (n >= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
     }//运算结果： ？？ 1.75*cap
+    //int： 32位   （右移1,2,4,8,16使得所有位均为1，later+1 ok-->最小的2^n）
 }
 ```
 ### Node-Iterator(entrySet method)
@@ -465,6 +468,7 @@ final Node<K,V> removeNode(int hash, Object key, Object value,
     return null;
 }
 ```
+关于扩容，链表元素：[深入解析HashMap原理（基于JDK1.8）](https://blog.csdn.net/qq_37113604/article/details/81353626)     
 避免不必要的扩容:     
 假设要存储1000个     
 设1024 but 1024*0.75&lt;1000  : so  set  2048   
