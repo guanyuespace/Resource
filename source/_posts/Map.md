@@ -20,7 +20,7 @@ The behavior of a map is not specified if the value of an object is changed in a
 A special case of this prohibition is that it is not permissible for a map to contain itself as a key.      
 While it is permissible for a map to contain itself as a value, extreme caution is advised: the <tt>equals</tt> and <tt>hashCode</tt> methods are no longer well defined on such a map.   
 
-
+<!-- more -->
 ```java
 public interface Map<K,V> {
   /**
