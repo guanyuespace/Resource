@@ -8,7 +8,8 @@ tags:
 - Java
 - Utils
 ---
-# byte2HexString
+# byte&String
+## byte2HexString
 ```java
 public void byte2HexString(byte[] bytes){
     if (bytes == null) return null;
@@ -21,5 +22,20 @@ public void byte2HexString(byte[] bytes){
         ret.append("0123456789abcdef".charAt(b));
     }
     return ret.toString();
+}
+```
+
+## hexString2Byte
+```java
+public void hexString2Byte(String str){
+  if (str==null||str.length()&0x1==1) return null;
+  str=str.toLowerCase();
+  byte[] ret=new byte[str.length()/2];
+  for(int i=0;i<str.length;i++){
+    byte high = (byte) "0123456789abcdef".indexOf(str.charAt(i));
+    byte low = (byte) "0123456789abcdef".indexOf(str.charAt(++i));
+    ret[i/2] = (byte) ((byte)(high<<4) | low );
+  }
+  return ret;
 }
 ```

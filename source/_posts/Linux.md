@@ -6,6 +6,7 @@ tags:
 - Linux
 ---
 # Linux
+>参考:[how do i install ubuntu alongside a pre installed windows with uefi](https://askubuntu.com/questions/221835/how-do-i-install-ubuntu-alongside-a-pre-installed-windows-with-uefi)
 
 ## 内存空间查看
 - df: df -lh
@@ -13,7 +14,7 @@ tags:
 - cfdisk
 <!-- more -->
 
-## Linux分区挂载点介绍  
+## Linux分区挂载点介绍(old, just for comprehension)  
 Linux分区挂载点介绍，推荐容量仅供参考不是绝对，跟各系统用途以及硬盘空间配额等因素实际调整：      
 
 | 分区类型 | 介绍 | 备注 |
@@ -46,6 +47,85 @@ vmlinuz initrd=initrd.img linux dd quiet
 重启后：
 vmlinuz initrd=initrd.img inst.stage2=hd:/dev/sdb4 quiet   ps：/dev/sdb4就是你看到的启动盘名称
 ```
+
+## UEFI引导与BIOS引导
+...  
+Warning: When dual-booting, avoid reformatting the ESP, as it may contain files required to boot other operating systems.   
+Keep in mind in here, maybe you have to configure disk form and booting system to GPT partition’s UEFI   
+
+### EFI(ESP)
+The EFI system partition (also called ESP) is an OS independent partition that acts as the storage place for the EFI bootloaders, applications and drivers to be launched by the UEFI firmware. It is mandatory for UEFI boot.       
+
+If you are installing Arch Linux on an UEFI-capable computer with an installed operating system, like Windows 10 for example, it is very likely that you already have an EFI system partition.    
+
+To find out the disk partition scheme and the system partition, use fdisk as root on the disk you want to boot from:   
+```shell
+# fdisk -l /dev/sd*
+```
+The command returns:
+- The disk's partition table: it indicates Disklabel type: gpt if the partition table is GPT or Disklabel type: dos if it is MBR.
+- The list of partitions on the disk: Look for the EFI system partition in the list, it is a small (usually about 100–550 MiB) partition with a type EFI System or EFI (FAT-12/16/32). To confirm this is the ESP, mount it and check whether it contains a directory named EFI, if it does this is definitely the ESP.
+
+#### create partition: efi
+Warning: The EFI system partition must be a physical partition in the main partition table of the disk, not under LVM or software RAID etc.
+
+To avoid potential problems with some UEFI implementations, **the ESP should be formatted with FAT32 and the size should be at least 512 MiB.** 550 MiB is recommended to avoid MiB/MB confusion and accidentally creating FAT16, although larger sizes are fine.
+
+*According to a Microsoft note, the minimum size for the EFI system partition (ESP) would be 100 MiB,* though this is not stated in the UEFI Specification. *Note that for Advanced Format 4K Native drives (4-KiB-per-sector) drives, the size is at least 256 MiB, because it is the minimum partition size of FAT32 drives (calculated as sector size (4KiB) x 65527 = 256 MiB), due to a limitation of the FAT32 file format.*
+
+## Secure Boot
+SecureBoot
+
+"Secure Boot" is a new UEFI feature that appeared in 2012, with Windows 8 preinstalled computers. Ubuntu supports this feature starting with 12.10 64 bit (see this article) and 12.04.2 64 bit, but as PCs implementing support for it have only become widespread at the end of 2012 it is not yet widely tested, so it's possible that you may encounter problems booting Ubuntu under Secure Boot.            
+
+IMPORTANT: If you do find a bug, please file a bug report against the shim package in Ubuntu, preferably using the command:       
+```shell
+ubuntu-bug shim
+```
+once you've installed with Secure Boot disabled. As mentioned by slangasek:
+
+It is not required to disable SecureBoot in the firmware to install Ubuntu on a Windows 8 machine. Ubuntu 12.04.2 and 12.10 are SecureBoot-compatible. Any machine that ships with the recommended Microsoft Third-Party Marketplace keys in firmware will be able to boot Ubuntu under SecureBoot. If there is any problem file a launchpad bug for the shim package.
+<!-- This was with Secure Boot on and on an EFI enabled boot system(Ubuntu 15.04 X64). I also. Tested 4 Windows 10 PCs and it worked perfectly with 15.10 & 16.04. -->
+<!-- The message above shows you can install Ubuntu whose version is higher than 15.04(X64) with SecureBoot on,but you will fail to install it with SecureBoot on somtimes.  -->
+<!-- you should turn off the SecureBoot for ... -->
+
+
+### Installing Ubuntu
+The following is a small guide to install Ubuntu with a Pre-Installed Windows 8 or 10 system. The steps HAVE TO BE done in the precise order I mention them here to get everything started. If a step is skipped or done before another, you will most likely end up with some of the problems mentioned at the bottom of this guide.
+
+For the time, you need to do it via a LiveCD, LiveDVD or LiveUSB, assuming (actually requiring) you have the following points:       
+<!--   
+just be ready      
+\- You are using a 64-bit version of at least Ubuntu 12.04.2. 32-bit versions will not work.   
+\- Your system came with Windows 8 or 10 pre-installed (And you do not want to delete it)   
+\- You are not installing Ubuntu inside of Windows 8 or 10 but rather alongside of it. Inside it is impossible because it needs Wubi which is unsupported.
+\- Your system has UEFI activated (And cannot be disabled) with Secure Boot.
+\- You have already created a free space for Ubuntu from within Windows 8 with at least 8 GB (I recommend to leave at least 20 GB or so, so you can test the hell out of it).   
+\- You made sure that you actually have free space left on the drive to create the needed partitions and you also made sure that you did not have all primary partitions used (In case of using an MS-DOS Scheme) because this will create a problem with the Ubuntu installer showing you only the "Replace Windows" option instead of the "Alongside Windows" option.   
+\- You know how to burn a LiveCD, LiveDVD or LiveUSB from within Windows 8. If not, look for Windows apps that can do that for you.^-^.   
+-->   
+- Windows 8 was not shutdown in either Hibernation mode(休眠模式) or any other mode ('fast start-up' which is by default on Windows 8) that leaves it on a saved state. *Shutdown Windows 8 in the normal way, with the shutdown option.* This will prevent other problems related to this from appearing. Read the bottom (TROUBLESHOOT) of this answer for more information regarding this point.
+- You are installing on an MS-DOS type(MBR) disk scheme (You can only have 4 primary partitions as opposed to GPT Scheme) which has at least 1 Free Primary Partition (You can find out the type of scheme you have from here if operating on an Ubuntu Live CD or here if from Windows). **Remember that if you are already using 4 Primary Partitions no partitions will appear on the Ubuntu installer since there are no more Primary partitions left to use (MS-DOS type partitions are limited to 4 Primary ones; GPT are limited to 128 because of the limitation of Windows).** This happens a lot on many laptops that come with 4 pre-created primary partitions. If you are installing on a GPT type partition and want it to boot, you need to *leave UEFI enabled*.
+
+## DUAL BOOT ISSUES
+<font size="+1" color="red">If you happen to install Ubuntu in Legacy Mode (No SecureBoot) you might have problems booting both, Windows and Ubuntu at the same time since they will both not appear on a Dual-Boot Menu. If you have Windows on UEFI for example and you install Ubuntu on Legacy Mode, you will only be able to boot to Ubuntu in Legacy Mode and Windows in UEFI Mode.</font><br/>
+
+So before proceeding, make sure that** you are installing Ubuntu with the same boot options as Windows.** This way you will be able to choose which one to boot from in the same boot menu and not worry if one will work or not. From the Ubuntu UEFI Guide you can see that there is a section that teaches you how to know if you actually installed Ubuntu in the same Boot setup as Windows (UEFI Mode)
+```
+An Ubuntu installed in EFI mode can be detected the following way:
+    its /etc/fstab file contains an EFI partition (mount point: /boot/efi)
+    it uses the grub-efi bootloader (not grub-pc)
+    from the installed Ubuntu, open a terminal (Ctrl+Alt+T) then type the following command:
+
+    [ -d /sys/firmware/efi ] && echo "Installed in EFI mode" || echo "Installed in Legacy mode"
+```  
+So if you have ANY dual boot problems, this could be the problem. Please read the [Ubuntu UEFI Guide](https://help.ubuntu.com/community/UEFI) since it covers various ways of solving Dual boot problems and converting Ubuntu to Legacy or EFI mode. I have already tested this with various Ask Ubuntu members that helped me apart from 2 Laptops I was provided with for the testing. This should then solve any Dual Boot problems related to Windows 8 + Ubuntu, but I again encourage anyone with problems (same or new) to file a bug report as mentioned above. The Ubuntu Developers are working very hard in providing an easy to install solution for all cases and this is one of the top priorities.     
+
+
+### Some points we should consider before continuing
+- If Windows 8 was installed with UEFI enabled, it is highly recommended to stay in UEFI, although if you still want to disable it for specific reasons you can, GRUB will create the bootable part for Windows 8. But if you do disable UEFI and want to access Windows 8 afterward (before installing Ubuntu), it will not work since the boot part for Windows 8 needs UEFI (Again the Dual Boot problem).
+- If you only disable Secure Boot, there is no problem in some cases. You are only disabling the part that creates the most problem between Windows and Linux, which is the one that prevents Ubuntu from booting correctly.**In either case, I encourage you to first try to install Ubuntu with UEFI/Secureboot, since in most cases it will work. if you disable any of them and install Ubuntu, you might not be able to boot to Windows 8 afterward through the GRUB Boot Menu.**
+
 
 ## 问题     
 
@@ -136,7 +216,8 @@ menuentry "Windows 10" {
 
 <!-- WinPE 修复引导项失败，重装系统... -->  
 <!-- Windows 10重装UEFI -- GPT;BIOS -- MBR(Secure Boot: disable;Fast Boot: disable;Prefered OS: disable;). -->
-<!-- EFI partitions: efi, msr, primary -->
+<!-- SECURE BOOT功能:Windows 8中增加了一个新的安全功能,Secure Boot内置于UEFI BIOS中,用来对抗感染MBR、BIOS的恶意软件,  Windows 8 缺省将使用Secure Boot,在启动过程中，任何要加载的模块必须签名(强制的)，UEFI固件会进行验证， 没有签名或者无法验证的，将不会加载。 -->
+<!-- EFI partitions: efi(esp) 260M, msr 1024M, primary -->
 <!-- shift+f10 : commandline : diskpart  , help, list, sel, clean, convert gpt/mbr, create partition xxxx size=xxxx etc.  -->
 惨败收场
 --
