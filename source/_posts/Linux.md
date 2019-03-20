@@ -276,6 +276,7 @@ USB连接选项：仅限充电
 [how to make my pci wifi card rtl8822 working on ubuntu](https://askubuntu.com/questions/926364/how-to-make-my-pci-wifi-card-rtl8822-working-on-ubuntu)  
 [Lenovo A485:RTL8822BE-firmware](https://github.com/samcv/A485-RTL8822BE-firmware)   
 [No WiFi adapter in ubuntu 18 04 LTS](https://h30434.www3.hp.com/t5/Notebook-Wireless-and-Networking/No-WiFi-adapter-in-ubuntu-18-04-LTS/m-p/6785800#M154574)    
+...
 
 
 ### 内核升级
