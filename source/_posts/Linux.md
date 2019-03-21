@@ -243,29 +243,49 @@ menuentry "Windows 10" {
 ~~惨败收场~~   
 ~~solvedsolvedsolvedsolvedsolvedsolvedsolvedsolved~~
 
-### ~~Cent OS下无法连接wifi(无线网卡：rtl8822be)~~
-No Adapter   
-参照[rtlwifi_new](https://github.com/lwfinger/rtlwifi_new)  [rtlwifi_next](https://github.com/rtlwifi-linux/rtlwifi-next.git),编译失败   
-怀疑：`This code will build on any kernel 4.2 and newer as long as the distro has not modified any of the kernel APIs.`    
-刚安装Cent OS 7.6 内核版本3.1  
+### ~~Cent OS下无法连接wifi(无线网卡：rtl8822be  solved)~~
+~~No WiFi Adapter found ~~
+~~参照[rtlwifi_new](https://github.com/lwfinger/rtlwifi_new)  [rtlwifi_next](https://github.com/rtlwifi-linux/rtlwifi-next.git),编译失败 ~~  
+~~怀疑：`This code will build on any kernel 4.2 and newer as long as the distro has not modified any of the kernel APIs.`~~    
+~~刚安装Cent OS 7.6 内核版本3.1~~  
 
-没有有线网，没有wifi，一台笔记本 jj ... ...
+~~没有有线网，没有wifi，一台笔记本 jj ... ...~~
 
 ....
 
-升级内核5.1后     
-[rtlwifi_new](https://github.com/lwfinger/rtlwifi_new.git)编译成功,成功安装
+~~升级内核5.1后~~     
+~~[rtlwifi_new](https://github.com/lwfinger/rtlwifi_new.git)编译成功,成功安装~~
 ```sh
 sudo modprobe -r rtl8822be
 sudo modprobe rtl8822be
 ```
-执行到此处时，出错
-modprobe ...
+~~执行到此处时，出错(不明语句含义。。。 。。。)~~    
+~~modprobe ...~~   
 
 ```
 lspci | grep Wireless
 ```
-无显示
+~~无显示~~
+
+~~solvedsolvedsolvedsolvedsolvedsolvedsolvedsolvedsolvedsolvedsolvedsolved~~
+
+#### 解决方法
+**Lenovo Legion Y7000P+Cent OS 7.6(kernel:5.)**   
+```shell
+gedit /etc/modprobe.d/blacklist.conf
+  blacklist ideapad_laptop
+
+rmmod ideapad_laptop
+```
+具体含义... ...
+
+参考：    
+[still-no-wifi-adapter-for-realtek-rtl8822be-found-in-18-04](https://askubuntu.com/questions/1067286/still-no-wifi-adapter-for-realtek-rtl8822be-found-in-18-04)  
+[联想拯救者 + ubuntu16.04 + WIFI设置](https://www.jianshu.com/p/e513b515149f)       
+[无线网卡无法使用的问题](https://www.jianshu.com/p/d7731e86379b)    
+[联想笔记本安装ubuntu，无线网卡被禁用的问题及解决方法](https://blog.csdn.net/Nurke/article/details/76465968)  
+
+
 
 ### USB共享手机网络
 MIUI 系统
