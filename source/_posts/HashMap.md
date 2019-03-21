@@ -473,3 +473,7 @@ final Node<K,V> removeNode(int hash, Object key, Object value,
 假设要存储1000个     
 设1024 but 1024*0.75&lt;1000  : so  set  2048   
 ....
+
+## later
+
+about TreeNode ... ...
