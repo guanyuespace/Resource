@@ -474,6 +474,75 @@ final Node<K,V> removeNode(int hash, Object key, Object value,
 设1024 but 1024*0.75&lt;1000  : so  set  2048   
 ....
 
+### Serializable(Write/Read)
+```java
+private void writeObject(java.io.ObjectOutputStream s) throws IOException {
+    int buckets = capacity();
+    // Write out the threshold, loadfactor, and any hidden stuff
+    s.defaultWriteObject();
+    s.writeInt(buckets);
+    s.writeInt(size);
+    internalWriteEntries(s);
+}
+void internalWriteEntries(java.io.ObjectOutputStream s) throws IOException {
+    Node<K,V>[] tab;
+    if (size > 0 && (tab = table) != null) {
+        for (int i = 0; i < tab.length; ++i) {
+            for (Node<K,V> e = tab[i]; e != null; e = e.next) {
+                s.writeObject(e.key);
+                s.writeObject(e.value);
+            }
+        }
+    }
+}
+
+
+private void readObject(java.io.ObjectInputStream s) throws IOException, ClassNotFoundException {
+    // Read in the threshold (ignored), loadfactor, and any hidden stuff
+    s.defaultReadObject();
+    reinitialize();
+    if (loadFactor <= 0 || Float.isNaN(loadFactor))
+        throw new InvalidObjectException("Illegal load factor: " +
+                                         loadFactor);
+    s.readInt();                // Read and ignore number of buckets
+    int mappings = s.readInt(); // Read number of mappings (size)
+    if (mappings < 0)
+        throw new InvalidObjectException("Illegal mappings count: " +
+                                         mappings);
+    else if (mappings > 0) { // (if zero, use defaults)
+        // Size the table using given load factor only if within
+        // range of 0.25...4.0
+        float lf = Math.min(Math.max(0.25f, loadFactor), 4.0f);
+        float fc = (float)mappings / lf + 1.0f;/////////size of mappings + 1
+        int cap = ((fc < DEFAULT_INITIAL_CAPACITY) ?
+                   DEFAULT_INITIAL_CAPACITY :
+                   (fc >= MAXIMUM_CAPACITY) ?
+                   MAXIMUM_CAPACITY :
+                   tableSizeFor((int)fc));//////////threshold
+        float ft = (float)cap * lf;
+        threshold = ((cap < MAXIMUM_CAPACITY && ft < MAXIMUM_CAPACITY) ?
+                     (int)ft : Integer.MAX_VALUE);
+
+        // Check Map.Entry[].class since it's the nearest public type to
+        // what we're actually creating.
+        SharedSecrets.getJavaOISAccess().checkArray(s, Map.Entry[].class, cap);
+        @SuppressWarnings({"rawtypes","unchecked"})
+        Node<K,V>[] tab = (Node<K,V>[])new Node[cap];
+        table = tab;
+
+        // Read the keys and values, and put the mappings in the HashMap
+        for (int i = 0; i < mappings; i++) {
+            @SuppressWarnings("unchecked")
+                K key = (K) s.readObject();
+            @SuppressWarnings("unchecked")
+                V value = (V) s.readObject();
+            putVal(hash(key), key, value, false, false);
+        }
+    }
+}
+```
+
+
 ## later
 
 about TreeNode ... ...
