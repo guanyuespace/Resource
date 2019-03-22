@@ -1,5 +1,3 @@
-# Resource
-blog
+# README  
 
-## source  
-guanyuespace.github.io
+guanyue's blog

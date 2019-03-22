@@ -212,7 +212,7 @@ get(key) != null ?
 | computeIfPresent | 旧值不空则计算，新值不空加入 |
 
 ---
-# add-ons
+# add-ons(FunctionalInterface)
 ## Function
 ```java
 /**
@@ -288,6 +288,7 @@ public interface Function<T, R> {
     }
 }
 ```   
+
 ## BiFunction  
 ```java
 /**

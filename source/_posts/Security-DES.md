@@ -9,6 +9,15 @@ tags:
 - encryption
 - decryption
 ---
+<!-- TOC -->
+
+- [DES](#des)
+  - [输入](#%E8%BE%93%E5%85%A5)
+  - [使用`javax.crypto`](#%E4%BD%BF%E7%94%A8javaxcrypto)
+    - [密钥生成](#%E5%AF%86%E9%92%A5%E7%94%9F%E6%88%90)
+    - [分组加密-加密模式](#%E5%88%86%E7%BB%84%E5%8A%A0%E5%AF%86-%E5%8A%A0%E5%AF%86%E6%A8%A1%E5%BC%8F)
+
+<!-- /TOC -->
 # DES
 分组加密算法，对称加密算法
 ## 输入

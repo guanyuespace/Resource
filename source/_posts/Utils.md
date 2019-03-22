@@ -8,6 +8,13 @@ tags:
 - Java
 - Utils
 ---
+<!-- TOC -->
+
+- [byte&String](#bytestring)
+  - [byte2HexString](#byte2hexstring)
+  - [hexString2Byte](#hexstring2byte)
+
+<!-- /TOC -->
 # byte&String
 ## byte2HexString
 ```java
