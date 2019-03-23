@@ -124,7 +124,7 @@ just be ready
 #### Before we start we need to do the following:
 Run`compmgmt.msc`on Windows 8. From there on, create a partition with enough size. Note that I mention creating this FROM Windows 8 because I have had cases where doing the partition from the LiveUSB rendered Windows 8 unbootable, even after doing a boot repair. So to remove that problem or have a greater chance of removing it (Or simply skipping the problem altogether) and making sure both systems work, partition your hard drive from within Windows 8 first.     
 Now follow this steps to have a working Windows 8 + Ubuntu installed on your system:   
-**Windows 8 + Ubuntu**   
+**Windows 8 + Ubuntu**      
 We first need to know with `what type of motherboard options we are dealing with.` Open a terminal (By going to the start menu and typing PowerShell for example) and run the terminal as an Administrator (Right Click the app that will show in the start menu and select Run as Administrator). Now type `Confirm-SecureBootUEFI`. This can give you 3 results:   
 ```
 True - Means your system has a Secure boot and is Enabled
@@ -133,6 +133,8 @@ Cmdlet not supported on this platform - Means your system does not support Secur
       You can install Ubuntu by simply inserting the LiveCD or LiveUSB and doing the installation procedure without any problems.
 ```
 If you have it Enabled and have the necessary partitioning done then we can proceed with this guide. After booting into Windows 8 we go to the power off options and while holding the SHIFT key, click on Restart.
+
+
 ### Select UEFI Firmware Settings
 *NOTE - In the Spanish version of Windows 8, the option for UEFI Firmware Settings is not available in several laptops, tested Lenovo, HP, and Acer.* They do have an option to boot the computer and another custom menu will appear which lets you do a couple of things. In the case of Lenovo, you will not have an option to install Ubuntu with Windows 8, the only option is to remove Windows 8 completely. This only applies if you are not using 15.04+.
 
@@ -145,27 +147,29 @@ If you find this options, then depending if you cannot install Ubuntu with Secur
 ## DUAL BOOT ISSUES
 <font size="+1" color="red">If you happen to install Ubuntu in Legacy Mode (No SecureBoot) you might have problems booting both, Windows and Ubuntu at the same time since they will both not appear on a Dual-Boot Menu. If you have Windows on UEFI for example and you install Ubuntu on Legacy Mode, you will only be able to boot to Ubuntu in Legacy Mode and Windows in UEFI Mode.</font><br/>
 
-So before proceeding, make sure that** you are installing Ubuntu with the same boot options as Windows.** This way you will be able to choose which one to boot from in the same boot menu and not worry if one will work or not. From the [Ubuntu UEFI Guide](https://help.ubuntu.com/community/UEFI#Converting_Ubuntu_into_EFI_mode) you can see that there is a section that teaches you how to know if you actually installed Ubuntu in the same Boot setup as Windows (UEFI Mode)
+So before proceeding, make sure that** you are installing Ubuntu with the same boot options as Windows.** This way you will be able to choose which one to boot from in the same boot menu and not worry if one will work or not. From the [Ubuntu UEFI Guide](https://help.ubuntu.com/community/UEFI#Converting_Ubuntu_into_EFI_mode) you can see that there is a section that teaches you how to know if you actually installed Ubuntu in the same Boot setup as Windows (UEFI Mode)    
+
 ```
 An Ubuntu installed in EFI mode can be detected the following way:
     its /etc/fstab file contains an EFI partition (mount point: /boot/efi)
     it uses the grub-efi bootloader (not grub-pc)
     from the installed Ubuntu, open a terminal (Ctrl+Alt+T) then type the following command:
-
     [ -d /sys/firmware/efi ] && echo "Installed in EFI mode" || echo "Installed in Legacy mode"
 ```  
+
 So if you have ANY dual boot problems, this could be the problem. Please read the [Ubuntu UEFI Guide](https://help.ubuntu.com/community/UEFI) since it covers various ways of solving Dual boot problems and converting Ubuntu to Legacy or EFI mode. I have already tested this with various Ask Ubuntu members that helped me apart from 2 Laptops I was provided with for the testing. This should then solve any Dual Boot problems related to Windows 8 + Ubuntu, but I again encourage anyone with problems (same or new) to file a bug report as mentioned above. The Ubuntu Developers are working very hard in providing an easy to install solution for all cases and this is one of the top priorities.     
 
 
-### Some points we should consider before continuing
-- If Windows 8 was installed with UEFI enabled, it is highly recommended to stay in UEFI, although if you still want to disable it for specific reasons you can, GRUB will create the bootable part for Windows 8. But if you do disable UEFI and want to access Windows 8 afterward (before installing Ubuntu), it will not work since the boot part for Windows 8 needs UEFI (Again the Dual Boot problem).
-- If you only disable Secure Boot, there is no problem in some cases. You are only disabling the part that creates the most problem between Windows and Linux, which is the one that prevents Ubuntu from booting correctly.**In either case, I encourage you to first try to install Ubuntu with UEFI/Secureboot, since in most cases it will work. if you disable any of them and install Ubuntu, you might not be able to boot to Windows 8 afterward through the GRUB Boot Menu.**
+### Some points we should consider before continuing    
+- If Windows 8 was installed with UEFI enabled, it is highly recommended to stay in UEFI, although if you still want to disable it for specific reasons you can, GRUB will create the bootable part for Windows 8. But if you do disable UEFI and want to access Windows 8 afterward (before installing Ubuntu), it will not work since the boot part for Windows 8 needs UEFI (Again the Dual Boot problem).    
+- If you only disable Secure Boot, there is no problem in some cases. You are only disabling the part that creates the most problem between Windows and Linux, which is the one that prevents Ubuntu from booting correctly.**In either case, I encourage you to first try to install Ubuntu with UEFI/Secureboot, since in most cases it will work. if you disable any of them and install Ubuntu, you might not be able to boot to Windows 8 afterward through the GRUB Boot Menu.**    
 
 Now before saving, some motherboards offer a `Boot Mode` option. Verify that this option is not pointing to `UEFI Boot` but instead to `CSM Boot` (Compatibility Support Module) which provides support for Legacy BIOS like systems.    
 Other systems offer a UEFI Boot option you can enable or disable. Depending on the options I mentioned above you can set this to the one you want.     
 And lastly, others offer a UEFI/Legacy Boot First option where you select which one you wish to use first. Obviously, the option is self-explanatory.    
 
 others ... ...
+
 
 ## 问题     
 
@@ -177,14 +181,15 @@ others ... ...
 如果选则不创建grub引导，则会跳过此布异常，但是开机后会直接进入windows需要在windows下创建Cent OS引导项...
 <!--谜之操作: 存在一次安装时，成功:将/biosboot, /boot分区挂载到C盘，其他分区不用管，**并将引导项装入C盘**，安装完成后，可以启动Linux但是Windows引导项被覆盖，无法进入windows -->   
 
-### ~~修复windows引导项(solved)~~
+### ~~修复windows引导项(solved)~~   
 >参考:[how do i install ubuntu alongside a pre installed windows with uefi](https://askubuntu.com/questions/221835/how-do-i-install-ubuntu-alongside-a-pre-installed-windows-with-uefi)   
 > [DUAL BOOT ISSUES](### DUAL BOOT ISSUES)   
 >
 >**对于本次装机中此问题的产生原因：对Win 10装机时采用UEFI引导（SecureBoot: enable;UEFI:first）;而装双系统时，Cent OS采用了BIOS引导（SecureBoot：disable;Lengacy  Lengacy first）,因此开机时只出现Cent OS 引导而没有Win 10引导（猜测：当采用UEFI first启动时能够启动win 10）**    
 > 采用UEFI引导装机（Linux）后，重启同时出现Win 10与Cent OS引导项
 
-~~编辑`/boot/grub2/grub.cfg`文件~~     
+~~编辑`/boot/grub2/grub.cfg`文件~~    
+
 ```sh
 menuentry "Windows 10" {
     insmod part_msdos  //mdr分区
@@ -193,6 +198,7 @@ menuentry "Windows 10" {
     chainloader +1    
 }
 ```   
+
 ~~大致解释下，hd0 代表 Windows 系统所在的硬盘，msdos1 代表 Windows 系统所在的分区。需要注意的是，Grub 对所有硬盘的分类都表示为 hd，但现在 Linux 系统大多为 Grub2 引导，Grub2 对磁盘的分类更加详细。~~      
 ~~磁盘分类可能表示为 hd 、sd ，其中 hd0 表示第一块磁盘， hd1 表示第二块... 依此类推。对于 sd 则有所不同，sda 表示第一块磁盘，sdb 表示第二块... 依此类推。~~    
 ~~Linux 中通过 `df -TH` 命令可以查看硬盘的具体信息，比如你的 Windows 系统所在的硬盘为 sdb4，则代表是第二块硬盘的第四分区，代码表示为 '(sd1,msdos4)'~~        
@@ -201,6 +207,7 @@ menuentry "Windows 10" {
 
 #### ~~进入Cent OS前~~
 ~~进入系统前"press C for commandline"--&gt;grub~~  
+
 ```sh
 grub>ls -l
 
@@ -219,7 +226,9 @@ grub>chainloader EFI/Boot/bootx64.efi
 
 grub>boot
 ```
+
 #### ~~进入Cent OS后~~
+
 ```sh
 #gedit /boot/grub2/grub.cfg
 
@@ -232,6 +241,7 @@ menuentry "Windows 10" {
 
 #reboot
 ```
+
 
 ~~尝试多次，失败告终...~~    
 

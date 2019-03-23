@@ -26,8 +26,6 @@ This class implements the <tt>Set</tt> interface, backed by a hash table (actual
 Note: Great care must be exercised if mutable objects are used as set elements.(will modify the value in Set, just like clone--浅拷贝)
 <!-- should also care this in HashMap,HashSet -->
 
-
 ... ...
 
-
-***the hash of entry in HashMap：table is unmutable, it is fixed when create entry, so add a mutable entry, and then you can change it(Particularly, you can make it be same to others, but its place(or hash) in table is fixed just like before.) ***     
+***the hashcode of entry in HashMap：~~table is unmutable,~~ it is fixed when create entry, so add a mutable entry, and then you can change it(Particularly, you can make it be same with others, but its place(or hash) in table is fixed just like before.).When resize the Map, the hashcode will not change. ***     
