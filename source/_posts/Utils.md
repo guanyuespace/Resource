@@ -46,3 +46,18 @@ public void hexString2Byte(String str){
   return ret;
 }
 ```
+# base64&Img
+> just base64 encode/decode
+
+## Base64toImg
+```java
+public static void parseImg(String path, String imgStr) {
+    Base64.Decoder decoder = Base64.getDecoder();
+    byte[] retbytes = decoder.decode(imgStr);
+    try {
+        Files.write(Paths.get(path), retbytes);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+```
