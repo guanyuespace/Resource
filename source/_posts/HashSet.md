@@ -9,7 +9,7 @@ tags:
 - Java
 - HashSet
 ---
-# HashSet
+# HashSet  
 ```java
 public class HashSet<E>
     extends AbstractSet<E>
@@ -20,6 +20,34 @@ This class implements the <tt>Set</tt> interface, backed by a hash table (actual
 `Set s = Collections.synchronizedSet(new HashSet(...));`   
 
 <!-- more -->
+## Abstract
+> 主要实现依赖于HashMap
+
+```java
+public class HashSet<E>
+    extends AbstractSet<E>
+    implements Set<E>, Cloneable, java.io.Serializable{
+
+    private transient HashMap<E,Object> map;
+    /**
+     * Constructs a new, empty set; the backing <tt>HashMap</tt> instance has
+     * default initial capacity (16) and load factor (0.75).
+     */
+    public HashSet() {
+        map = new HashMap<>();
+    }
+    public Iterator<E> iterator() {
+        return map.keySet().iterator();
+    }
+    public boolean remove(Object o) {
+       return map.remove(o)==PRESENT;
+    }
+    public boolean add(E e) {
+       return map.put(e, PRESENT)==null;
+    }
+}
+```
+
 
 ... ...
 ## Set

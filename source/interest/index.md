@@ -6,4 +6,4 @@ date: 2019-02-14 14:39:10
 
 | index1 | index2 | index3 |
 | :--- | :--- | :--- |
-| [Binder机制](./Binder机制.html) | [WeChat Login&Others](./WeChat.html) | |
+| [Binder机制](./Binder机制.html) | [WeChat Login&Others](./WeChat.html) | [git常用](./git.html) |
