@@ -48,9 +48,61 @@ static {
  }
 ```
 
+### JavaScript实现
+>[cryptojs](git@github.com:gwjjeff/cryptojs.git)   
+在微信小程序中npm构建出错，解决：将代码复制到本地即可使用
+npm install cryptojs 可以在本地使用（node test.js）    
+>[crypto-js](git@github.com:brix/crypto-js.git)   
+npm install crypto-js
+
+### cryptojs测试demo
+```js
+var Crypto = require('./cryptojs/cryptojs.js').Crypto;//ok
+//解析运动数据
+var decryptData = function(data, session, iv,that) {
+  var dataBytes = Crypto.util.base64ToBytes(data);
+  var sessionBytes = Crypto.util.base64ToBytes(session);
+  var ivBytes = Crypto.util.base64ToBytes(iv);
 
 
+  var mode = new Crypto.mode.CBC(Crypto.pad.pkcs7);
+  var decryptData = Crypto.AES.decrypt(data, sessionBytes, {
+    mode: mode,
+    iv: ivBytes,
+    asBytes: true //false: bytesToBase64
+  });
+  console.log("decrypt: " + Crypto.charenc.UTF8.bytesToString(decryptData));
+}
+```
 
+#### demo(NodeJs)
+```js
+var crypto = require('crypto')
+function WXBizDataCrypt(sessionKey) {
+  this.sessionKey = sessionKey
+}
+
+WXBizDataCrypt.prototype.decryptData = function (encryptedData, iv) {
+  // base64 decode
+  var sessionKey = Buffer.from(this.sessionKey, 'base64')//base64解码
+  encryptedData = Buffer.from(encryptedData, 'base64')
+  iv = Buffer.from(iv, 'base64')
+  try {
+     // 解密
+    var decipher = crypto.createDecipheriv('aes-128-cbc', sessionKey, iv)
+    // 设置自动 padding 为 true，删除填充补位
+    decipher.setAutoPadding(true)
+    //cipher.update(data, [input_encoding], [output_encoding])
+    var decoded = decipher.update(encryptedData, 'binary', 'utf8')//解密
+    decoded += decipher.final('utf8')
+    decoded = JSON.parse(decoded)
+  } catch (err) {
+    throw new Error('Illegal Buffer')
+  }
+  return decoded
+}
+module.exports = WXBizDataCrypt
+```
 
 
 ## 输入
