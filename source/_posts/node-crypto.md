@@ -10,7 +10,10 @@ tags:
 ---
 # NodeJs
 >加解密工具
-const crypto=require("crypto")
+const crypto=require("crypto")    
+[浅谈nodejs中的Crypto模块](https://blog.csdn.net/XSFD_DFSX/article/details/81737130)   
+[\[转载\]加密算法库Crypto——nodejs中间件系列](https://www.cnblogs.com/sunws/p/4783358.html)
+
 
 
 ## 哈希&散列
@@ -41,21 +44,21 @@ HMAC全名是 *keyed-Hash Message Authentication Code* ，中文直译就是密�
 crypto.createHmac(algorithm, key)
 这个方法返回和createHash一样，返回一个HMAC的实例，有update和digest方法。
 ```js
-var crypto = require(‘crypto’);
-var fs = require(‘fs’);
+var crypto = require('crypto');
+var fs = require('fs');
 
-var pem = fs.readFileSync(‘key.pem’);
-var key = pem.toString(‘ascii’);
+var pem = fs.readFileSync('key.pem');
+var key = pem.toString('ascii');
 
-var hmac = crypto.createHmac(‘sha1’, key);
+var hmac = crypto.createHmac('sha1', key);
 
-hmac.update(‘foo’);
+hmac.update('foo');
 {}
-hmac.digest(‘hex’);
-‘7b058f2f33ca28da3ff3c6506c978825718c7d42’
+hmac.digest('hex');
+'7b058f2f33ca28da3ff3c6506c978825718c7d42'
 ```
-先通过 fs.readFileSync 方法读取了key.pem密钥，然后将它转为ascii码，最后通过 createHmac(‘sha1’, key) 方法获得HMAC实例，然后执行update和digest，生成一串密钥字符串。
-由于key的不同，所以同样的字符串’foo’经过hmac加密后生成的16进制字符串也是不同的，从而更加保障了数据的安全性。  
+先通过 fs.readFileSync 方法读取了key.pem密钥，然后将它转为ascii码，最后通过 createHmac('sha1', key) 方法获得HMAC实例，然后执行update和digest，生成一串密钥字符串。
+由于key的不同，所以同样的字符串'foo'经过hmac加密后生成的16进制字符串也是不同的，从而更加保障了数据的安全性。  
 key.pem: 利用opensll命令来创建一个key.pem
 ```
 # openssl genrsa  -out server.pem 1024
@@ -64,38 +67,38 @@ key.pem: 利用opensll命令来创建一个key.pem
 
 ## 加解密算法
 ```js
-var crypto = require(‘crypto’);
-var fs = require(‘fs’);
+var crypto = require('crypto');
+var fs = require('fs');
 
-var pem = fs.readFileSync(‘key.pem’);
-var key = pem.toString(‘ascii’);
+var pem = fs.readFileSync('key.pem');
+var key = pem.toString('ascii');
 
-var cipher = crypto.createCipher(‘blowfish’, key);
+var cipher = crypto.createCipher('blowfish', key);
 
-cipher.update(new Buffer(4), ‘binary’, ‘hex’);
+cipher.update(new Buffer(4), 'binary', 'hex');
 ”
-cipher.update(new Buffer(4), ‘binary’, ‘hex’);
-‘ff57e5f742689c85’
-cipher.update(new Buffer(4), ‘binary’, ‘hex’);
+cipher.update(new Buffer(4), 'binary', 'hex');
+'ff57e5f742689c85'
+cipher.update(new Buffer(4), 'binary', 'hex');
 ”
-cipher.final(‘hex’)
-‘96576b47fe130547’
+cipher.final('hex')
+'96576b47fe130547'
 ```
 读取之前的key，然后利用 blowfish 加密算法生成 cipher 实例，接着update内容到cipher实例，最后通过cipher.final()方法输出加密串。     
 其中有几个方法我们要看下api的解释    
-```
+```js
 crypto.createCipher(algorithm, password)    
 crypto.createCipheriv(algorithm, key, iv)   
 ```     
 上面这2个方法都返回cipher实例，第一个参数 algorithm 表示用何种加密算法，可以利用 openssl list-cipher-algorithms 命令来查看你的系统支持哪些加密算法。password和key, iv表示密钥，即利用何种密钥加密，password是用来派生key和iv的，key的话是算法原生的key，iv表示初始化向量。    
-```
+```js
 cipher.update(data, [input_encoding], [output_encoding])    
 ```
-往cipher实例中添加数据，第一个参数是填充的数据，第二个参数表示传入数据的格式，可以是’utf8’, ‘ascii’ 或 ‘binary’，默认是 ‘binary’。第三个参数是返回block的数据格式。     
+往cipher实例中添加数据，第一个参数是填充的数据，第二个参数表示传入数据的格式，可以是'utf8', 'ascii' 或 'binary'，默认是 'binary'。第三个参数是返回block的数据格式。     
 注意:这里我们update了 new Buffer(4),表示通过随机内存中的4byte字节的内容填充进去。  
 *为什么第一次update没有block返回呢?* 因为4byte不够生成一个block，所以这点我们要注意下。
 最后我们通过final方法和之前digest方法一样，生成加密过后的串。
-```
+```js
 decipher.setAutoPadding(auto_padding=true)
 ```
 如果这些加密块不是使用标准的填充块的话，你可以把自动填充关闭。   
@@ -113,24 +116,24 @@ dec += decipher.final('utf8')
 ```
 ok。。。
 
-```
-var crypto = require(‘crypto’);
-var fs = require(‘fs’);
+```js
+var crypto = require('crypto');
+var fs = require('fs');
 
-var pem = fs.readFileSync(‘key.pem’);
-var key = pem.toString(‘ascii’);
+var pem = fs.readFileSync('key.pem');
+var key = pem.toString('ascii');
 
-var plaintext = Buffer.from(‘abcdefghijklmnopqrstuv’);
+var plaintext = Buffer.from('abcdefghijklmnopqrstuv');
 var encrypted = “”;
-var cipher = crypto.createCipher(‘blowfish’, key);
+var cipher = crypto.createCipher('blowfish', key);
 ..
-encrypted += cipher.update(plaintext, ‘binary’, ‘hex’);
-encrypted += cipher.final(‘hex’);
+encrypted += cipher.update(plaintext, 'binary', 'hex');
+encrypted += cipher.final('hex');
 
 var decrypted = “”;
-var decipher = crypto.createDecipher(‘blowfish’, key);
-decrypted += decipher.update(encrypted, ‘hex’, ‘binary’);
-decrypted += decipher.final(‘binary’);
+var decipher = crypto.createDecipher('blowfish', key);
+decrypted += decipher.update(encrypted, 'hex', 'binary');
+decrypted += decipher.final('binary');
 
 var output = new Buffer(decrypted);
 
@@ -141,33 +144,32 @@ plaintext
 最后我们看下签名和验证 Class: Signer 和 Class: Verify
 
 先通过openssl命令生成公钥：
-```
+```shell
 # openssl req -key server.pem -new -x509 -out cert.pem
 ```
 还记得我们之前说的不对称加密算法么，这里我们就利用私钥和公钥来做个简单的例子
-```
-var crypto = require(‘crypto’);
-var fs = require(‘fs’);
+```js
+var crypto = require('crypto');
+var fs = require('fs');
 
-var privatePem = fs.readFileSync(‘server.pem’);
-var publicPem = fs.readFileSync(‘cert.pem’);
+var privatePem = fs.readFileSync('server.pem');
+var publicPem = fs.readFileSync('cert.pem');
 var key = privatePem.toString();
 var pubkey = publicPem.toString();
 
 var data = “abcdef”
 
-var sign = crypto.createSign(‘RSA-SHA256’);
+var sign = crypto.createSign('RSA-SHA256');
 sign.update(data);
 {}
-var sig = sign.sign(key, ‘hex’);
+var sig = sign.sign(key, 'hex');
 
-var verify = crypto.createVerify(‘RSA-SHA256’);
+var verify = crypto.createVerify('RSA-SHA256');
 verify.update(data);
 {}
 verify.update(data);
 {}
-verify.verify(pubkey, sig, ‘hex’);
+verify.verify(pubkey, sig, 'hex');
 1
 ```
-首先通过，crypto.createVerify(algorithm)和crypto.createSign(algorithm)方法生成实例，然后利用update方法更新数据，最后利用key（私钥）生成签名，同样的验证也是如此，最后通过 verify.verify(pubkey, sig, ‘hex’); 函数签名。
-   
+首先通过，crypto.createVerify(algorithm)和crypto.createSign(algorithm)方法生成实例，然后利用update方法更新数据，最后利用key（私钥）生成签名，同样的验证也是如此，最后通过 verify.verify(pubkey, sig, 'hex'); 函数签名。
