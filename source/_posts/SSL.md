@@ -19,6 +19,7 @@ SSL位与应用层和 TCP/IP之间的一层，数据经过它流出的时候被�
 SSL协议包含2个子协议，一个是 *包协议，* 一个是 *握手协议。* 包协议位于握手协议更下一层。
 
 SSL握手过程说简单点就是：**通信双方通过不对称加密算法来协商好一个对称加密算法以及使用的key，然后用这个算法加密以后所有的数据完成应用层协议的数据交换。**  
+<!-- more -->
 
 ## Https服务器
 >利用Nodejs搭建简易服务器
@@ -44,6 +45,7 @@ app.get("/getSession",(req,res)=>{
 http.createServer(app).listen(80);
 https.createServer(options,app).listen(443);
 ```
+
 ![微信小程序服务请求](./https.jpg "微信小程序服务请求")
 ![服务器返回结果](./https_res.jpg "服务器返回结果")
 
