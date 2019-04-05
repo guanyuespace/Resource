@@ -107,7 +107,9 @@ CFB模式与OFB模式不需要填充
 
 - PKCS7Padding（PKCS5Padding）
 为.NET和JAVA的默认填充方式，对加密数据字节长度对8取余为r，如r大于0，则补8-r个字节，字节为8-r的值；如果r等于0，则补8个字节8。比如：  
-加密字符串为为AA，则补位为AA666666;加密字符串为BBBBB，则补位为BBBBB333；加密字符串为CCCCCCCC，则补位为CCCCCCCC88888888。  
+加密字符串为为AA，则补位为AA666666;加密字符串为BBBBB，则补位为BBBBB333；加密字符串为CCCCCCCC，则补位为CCCCCCCC88888888。
+
+- AES算法中不支持PKCS7Padding，只支持PKCS5Padding 但是PKCS7Padding 和 PKCS5Padding 没有什么区别要实现在java端用PKCS7Padding填充，需要用到bouncycastle组件来实现 
 
 ---
 
