@@ -139,6 +139,8 @@ step4： 验证“服务器”的身份后，“客户”生成一个对称加�
 
 HTTPS 区别于 HTTP，它多了加密(encryption)，认证(verification)，鉴定(identification)。它的安全源自非对称加密以及第三方的 CA 认证。   
 
+### NodeJs 实现
+
 ```js
 var express = require('express');
 var https = require('https');
@@ -161,6 +163,9 @@ https.createServer(options,app).listen(443);
 
 ![微信小程序服务请求](./https.jpg "微信小程序服务请求")
 ![服务器返回结果](./https_res.jpg "服务器返回结果")
+
+### Java实现
+<!-- SSLSocketServer&keystore -->
 
 ### 证书创建
 >[HTTPS证书生成原理和部署细节](https://www.cnblogs.com/liyulong1982/p/6106129.html)   
@@ -187,18 +192,8 @@ https.createServer(options,app).listen(443);
 - 服务器端先使用私钥解密，拿到 premaster secret，此时客户端和服务器端都拥有了三个要素：random-client、random-server 和 premaster secret
 - 此时安全通道已经建立，以后的交流都会校检上面的三个要素通过算法算出的 session key
 
-#### 中间人攻击
-
-clinet -- random-client --&gt; hacker ---- random-hacker --&gt; Server    
-clinet &lt;-- random-client-back -- hacker &lt;---- random-hacker-back -- Server     
-... ...   
-
-
-
 #### CA 数字证书认证中心    
 如果网站只靠上图运作，可能会被中间人攻击，试想一下，在客户端和服务端中间有一个中间人，两者之间的传输对中间人来说是透明的，那么中间人完全可以获取两端之间的任何数据，然后将数据原封不动的转发给两端，由于中间人也拿到了三要素和公钥，它照样可以解密传输内容，并且还可以篡改内容。
-
-
 
 为了确保我们的数据安全，我们还需要一个 CA 数字证书。HTTPS的传输采用的是非对称加密，一组非对称加密密钥包含公钥和私钥，通过公钥加密的内容只有私钥能够解密。上面我们看到，整个传输过程，服务器端是没有透露私钥的。而 CA 数字认证涉及到私钥，整个过程比较复杂，我也没有很深入的了解，后续有详细了解之后再补充下。   
 
