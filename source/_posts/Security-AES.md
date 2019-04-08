@@ -15,6 +15,7 @@ tags:
 AES的区块长度固定为128 比特，密钥长度则可以是128，192或256比特
 
 - AES算法中不支持PKCS7Padding，只支持PKCS5Padding 但是PKCS7Padding 和 PKCS5Padding 没有什么区别要实现在java端用PKCS7Padding填充，需要用到bouncycastle组件来实现
+- jdk自带的aes加密只支持到128位，更高的256位的加密，需要到oracle官网下载jce包，替换java自带的加密包。
 
 ```
 // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk16
