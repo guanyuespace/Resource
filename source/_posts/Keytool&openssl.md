@@ -74,12 +74,13 @@ keystore和truststore从其文件格式来看其实是一个东西，只是为�
 
 
 ---
-1. 通过使用一下的命令来创建服务器端的密匙库
+# KeyTool
+1. 通过使用以下的命令来创建服务器端的密匙库
 ```shell
 keytool -genkey -alias hellking -keystore server.keystore -keyalg RSA  
 ```  
-以上命令执行完成后，将获得一个名为server.keystore的密匙库。   
-2. 生成客户端的信任库。首先输出RSA证书：  
+以上命令执行完成后，将获得一个名为server.keystore的密匙库。      
+2. 生成客户端的信任库。首先输出RSA证书：    
 ```shell
 keytool -export -file test_axis.cer -storepass changeit -keystore server.keystore     
 ```
@@ -89,9 +90,9 @@ keytool -import -file test_axis.cer -storepass changeit -keystore client.trustst
 ```
 3. 创建客户端密匙库。重复步骤1，创建客户端的密匙库。也可以使用以下命令来完成：
 ```shell
-keytool -genkey -dname " CN=hellking-Client, OU=tsinghua, O=tsinghua, L=BEIJING, S=BEIJING, C=CN" -storepass changeit -keystore client.keystore -keyalg RSA -keypass changeit  
+keytool -genkey -dname "CN=hellking-Client, OU=tsinghua, O=tsinghua, L=BEIJING, S=BEIJING, C=CN" -storepass changeit -keystore client.keystore -keyalg RSA -keypass changeit  
 ```
-4. 生成服务器端的信任库。
+4. 生成服务器端的信任库。    
 ```shell
 keytool -export -file test_axis.cer -storepass changeit -keystore client.keystore  
 keytool -import -file test_axis.cer -storepass changeit -keystore server.truststore -alias clientkey -noprompt  
