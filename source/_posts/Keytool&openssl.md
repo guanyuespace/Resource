@@ -8,6 +8,66 @@ categories:
 tags:
 - Certificate
 ---
+# openssl自签证书
+
+1. 为服务器端和客户端准备公钥、私钥
+
+ ```shell
+# 生成服务器端私钥
+openssl genrsa -out server.key 1024
+# 生成服务器端公钥
+openssl rsa -in server.key -pubout -out server.pem
+# 生成客户端私钥
+openssl genrsa -out client.key 1024
+# 生成客户端公钥
+openssl rsa -in client.key -pubout -out client.pem
+ ```
+
+2. 生成 CA 证书   
+
+ ```shell
+# 生成 CA 私钥
+openssl genrsa -out ca.key 1024
+# X.509 Certificate Signing Request (CSR) Management.
+openssl req -new -key ca.key -out ca.csr
+# X.509 Certificate Data Management.
+openssl x509 -req -in ca.csr -signkey ca.key -out ca.crt
+ ```
+在执行第二步时会出现：
+ ```shell
+➜ keys openssl req -new -key ca.key -out ca.csr
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+Country Name (2 letter code) [AU]:CN
+State or Province Name (full name) [Some-State]:Zhejiang
+Locality Name (eg, city) []:Hangzhou
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:My CA
+Organizational Unit Name (eg, section) []:
+Common Name (e.g. server FQDN or YOUR name) []:localhost
+Email Address []:
+ ```
+ 注意，这里的 *Organization Name* (eg, company) [Internet Widgits Pty Ltd]: 后面生成客户端和服务器端证书的时候也需要填写，**不要写成一样的！！！** 可以随意写如：My CA, My Server, My Client。   
+
+ 然后 Common Name (e.g. server FQDN or YOUR name) []: 这一项，是最后可以访问的域名，我这里为了方便测试，写成 localhost，如果是为了给我的网站生成证书，需要写成 barretlee.com。    
+
+3. 生成服务器端证书和客户端证书
+ ```shell
+# 服务器端需要向 CA 机构申请签名证书，在申请签名证书之前依然是创建自己的 CSR 文件
+openssl req -new -key server.key -out server.csr
+# 向自己的 CA 机构申请证书，签名过程需要 CA 的证书和私钥参与，最终颁发一个带有 CA 签名的证书
+openssl x509 -req -CA ca.crt -CAkey ca.key -CAcreateserial -in server.csr -out server.crt
+# client 端
+openssl req -new -key client.key -out client.csr
+# client 端到 CA 签名
+openssl x509 -req -CA ca.crt -CAkey ca.key -CAcreateserial -in client.csr -out client.crt
+ ```
+此时，ok...
+
+---
 
 # Keytool和OpenSSL生成和签发数字证书   
 >[Keytool和OpenSSL生成和签发数字证书](https://blog.csdn.net/naioonai/article/details/81045780)
@@ -39,13 +99,22 @@ openssl ca -in server.csr -out server.cer -cert test_ca.cer -keyfile test_ca.key
 ```
 ![使用OpenSSL RootCA 签发server端证书签名请求的证书](https://img-blog.csdn.net/20180714173226851 "使用OpenSSL RootCA 签发server端证书签名请求的证书")   
 **Question:**
-有时候,CA颁发机构和签名请求方极低可能是同一家公司或组织,即使是同一家公司或组织也可能是不同的部门,比如说,Android 组的朋友使用 Java 自带的 KeyTool 生成了一个签名请求文件(\*.csr)给我来签名,尽管我们所有关键域的值都是一样,但还是签不过,总是报如下问题:     
+ - **文件notfound**    
+参考：[OpenSSL生成证书对](http://blog.sina.com.cn/s/blog_49f8dc400100tznt.html)   
+```shell
+mkdir ./demoCA
+mkdir ./demoCA/newcerts
+touch index.txt
+vim serial // echo '01\n'>serial
+```
+
+ - **编码格式**     
+ 有时候,CA颁发机构和签名请求方极低可能是同一家公司或组织,即使是同一家公司或组织也可能是不同的部门,比如说,Android 组的朋友使用 Java 自带的 KeyTool 生成了一个签名请求文件(\*.csr)给我来签名,尽管我们所有关键域的值都是一样,但还是签不过,总是报如下问题:     
 ```
 The xxx field needed to be same
 ```
-
- ~~为什么 sichuang和 sichuang 不相同呢????~~    
- **原因就在于 Java 的 KeyTool 生成的签名请求文件的编码格式与 OpenSSL 的默认编码格式不一致,Java KeyTool默认使用就是全部 PRINTABLE 而 OpenSSL 既有PRINTABLE 也有 ASN 1.12。**    
+  ~~为什么 sichuang和 sichuang 不相同呢????~~    
+  **原因就在于 Java 的 KeyTool 生成的签名请求文件的编码格式与 OpenSSL 的默认编码格式不一致,Java KeyTool默认使用就是全部 PRINTABLE 而 OpenSSL 既有PRINTABLE 也有 ASN 1.12。**    
  解决方法：修改/etc/pki/tls/openssl.cnf 中如下选项         
  vim /etc/pki/tls/openssl.cnf
 ![solved_method](https://img-blog.csdn.net/20180714173519603 "solved_method")  
