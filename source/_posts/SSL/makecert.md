@@ -1,3 +1,7 @@
+---
+title: makecert的使用
+date: 2019-04-08 15:21:38
+---
 # makecert的使用
 >makecert.exe test.cer
 
