@@ -10,6 +10,7 @@ tags:
 ---
 # openssl自签证书
 
+<!-- more -->
 1. 为服务器端和客户端准备公钥、私钥
 
  ```shell
@@ -73,7 +74,7 @@ openssl x509 -req -CA ca.crt -CAkey ca.key -CAcreateserial -in client.csr -out c
 >[Keytool和OpenSSL生成和签发数字证书](https://blog.csdn.net/naioonai/article/details/81045780)
 
 生成数字签名证书具体操作          
-<!-- more -->
+
 1. 创建CA的自签名证书，做RootCA使用     
 ```shell
 openssl req -new -x509 -keyout test_ca.key -out test_ca.cer -days 3650
