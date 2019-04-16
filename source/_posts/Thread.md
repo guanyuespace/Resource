@@ -24,7 +24,6 @@ public interface Runnable {
 ```java
 public class Thread implements Runnable {
     private volatile String name;//
-    private int priority;//
     private Thread threadQ;//////
     private long eetop;//////////
     private boolean single_step;//////////
@@ -35,6 +34,7 @@ public class Thread implements Runnable {
     private ClassLoader contextClassLoader;//
     private AccessControlContext inheritedAccessControlContext;//
     private static int threadInitNumber;//
+    /////////////////ThreadLocal////////////////////////////
     ThreadLocalMap threadLocals = null;///////
     ThreadLocalMap inheritableThreadLocals = null;///////
     private long stackSize;//////
@@ -45,6 +45,10 @@ public class Thread implements Runnable {
     volatile Object parkBlocker;/////
     private volatile Interruptible blocker;//////
     private final Object blockerLock = new Object();//
+
+
+    //////////////////////priority//////////////////////
+    private int priority;//
     public static final int MIN_PRIORITY = 1;
     public static final int NORM_PRIORITY = 5;
     public static final int MAX_PRIORITY = 10;

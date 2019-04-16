@@ -4,7 +4,7 @@ date: 2019-04-15 16:03:02
 ---
 <!-- TOC -->
 
-- [1\. Unsafe 类](#1%5C-unsafe-%E7%B1%BB)
+- [1. Unsafe 类](#1-unsafe-%E7%B1%BB)
   - [1.1 获取实例](#11-%E8%8E%B7%E5%8F%96%E5%AE%9E%E4%BE%8B)
   - [1.2 常用方法](#12-%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95)
     - [1.2.1 Class 相关](#121-class-%E7%9B%B8%E5%85%B3)
@@ -28,10 +28,10 @@ date: 2019-04-15 16:03:02
 
 <!-- /TOC -->
 【Java 并发笔记】Unsafe 相关整理
-======================
+==
 >[转自：【Java 并发笔记】Unsafe 相关整理](https://www.jianshu.com/p/2e5b92d0962e)
 
-# 1\. Unsafe 类
+# 1. Unsafe 类
 
 *   Java 不能直接访问操作系统底层，而是通过本地方法来访问。Unsafe 类提供了硬件级别的原子操作。
 *   Unsafe 类在 **sun.misc** 包下，不属于 Java 标准。很多 Java 的基础类库，包括一些被广泛使用的高性能开发库都是基于 Unsafe 类开发，比如 Netty、Hadoop、Kafka 等。
