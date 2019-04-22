@@ -8,9 +8,9 @@ tag:
 - thinking
 ---
 
-<div style="background-image:url(http://5b0988e595225.cdn.sohucs.com/images/20180305/fa45432d378e45168ea620718209f14e.gif); background-position:left top; background-repeat: no-repeat; filter: grayscale(1) invert(1); padding:25px;"><!--mix-blend-mode:difference; -->
-  <font size="+2">2019.02.11-2019.04.15---&gt; 63天<br/>anxious, worrisome</font><br/>
-  <ul>
+<div style="width:100%; height:400px; background-image:url(http://5b0988e595225.cdn.sohucs.com/images/20180305/fa45432d378e45168ea620718209f14e.gif); background-position:left top; background-repeat: no-repeat; background-size: cover; filter:brightness(0.6); -webkit-filter:brightness(0.6); padding:25px; overflow:hidden">
+  <p style="font-size:x-large;filter: invert(1) grayscale(1) contrast(2); -webkit-filter: invert(1) grayscale(1) contrast(2);">2019.02.11-2019.04.15---&gt; 63天<br/>anxious, worrisome</p><br/>
+  <ul style="mix-blend-mode: difference;color:red;font-size:24px;font-weight:bolder; text-align:center;margin-top: 80px;">
     <li>茫然无措</li>
     <li>注目人生路口，斩立决断</li>
     <li>当断不断，必受其乱</li>
@@ -30,7 +30,7 @@ tag:
 ### MessageDigest  
 #### MD5
 #### SHA-1
-### encode/decode(Base64) 
+### encode/decode(Base64)
 
 ### List&Map
 ### String&StringBuilder
