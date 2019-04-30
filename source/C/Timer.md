@@ -99,6 +99,18 @@ int timer_delete (timer_t timerid)
 函数说明 sigaction()会依参数signum指定的信号编号来设置该信号的处理函数。参数signum可以指定SIGKILL和SIGSTOP以外的所有信号。
 
 
+# sigqueue
+```c
+sigqueue(pid_t pid, signal ,sigval)
+```
+
+
+
+
+
+
+
+
 ## Test
 
 ```c
