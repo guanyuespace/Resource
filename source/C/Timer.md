@@ -182,8 +182,7 @@ sigval{
 ```c
 sigqueue(pid_t pid, signal ,sigval)
 ```
-
-
+系统调用 sigqueue 发送信号时，sigqueue 的第三个参数就是 sigval 联合数据结构，当调用 sigqueue 时，该数据结构中的数据就将拷贝到信号处理函数的第二个参数中。这样，在发送信号同时，就可以让信号传递一些附加信息。信号可以传递信息对程序开发是非常有意义的。
 
 # Test
 
