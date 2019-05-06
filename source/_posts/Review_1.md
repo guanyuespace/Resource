@@ -20,7 +20,7 @@ tag:
 <style>
 	.mcontainer{
     overflow: hidden;
-    width:800px;
+    width:100%;
 		height:500px;
 		background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/2017/17_04_cat_bg_03.jpg);
 		background-size:cover;
