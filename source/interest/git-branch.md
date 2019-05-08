@@ -301,3 +301,271 @@ please contact us at email.support@github.com
 
 这个解决方案各采纳了两个分支中的一部分内容，而且我还删除了 `<<<<<<<`，`=======` 和 `>>>>>>>` 这些行。在解决了所有文件里的所有冲突后，运行 `git add` 将把它们标记为已解决状态（译注：实际上就是来一次快照保存到暂存区域。）。因为一旦暂存，就表示冲突已经解决。
 <!-- Resolve as ours then theirs or only use me... in atom.exe -->
+
+## 远程分支
+> `git push remote-name local-branch-name`<!-- 简化版，默认远程分支名与本地分支名相同 -->     
+> `git push remote-name local-branch-name:remote-branch-name`<!-- 本地分支提交到远程分支 -->     
+> `git push remote-name  :remote-branch-name` <!-- 删除远程分支 -->    
+>    
+> `git fetch remote-name`    
+> `git checkout --track remote-name/remote-branch-name`   
+> `git checkout -b new-local-branch-name remote-name/remote-branch-name`       
+
+远程分支（remote branch）是对远程仓库中的分支的索引。它们是一些无法移动的本地分支；只有在 Git 进行网络交互时才会更新。远程分支就像是书签，提醒着你上次连接远程仓库时上面各分支的位置。
+
+我们用 `(远程仓库名)/(分支名)` 这样的形式表示远程分支。比如我们想看看上次同 `origin` 仓库通讯时 `master` 分支的样子，就应该查看 `origin/master` 分支。如果你和同伴一起修复某个问题，但他们先推送了一个 `iss53` 分支到远程仓库，虽然你可能也有一个本地的 `iss53` 分支，但指向服务器上最新更新的却应该是 `origin/iss53` 分支。
+
+可能有点乱，我们不妨举例说明。假设你们团队有个地址为 `git.ourcompany.com` 的 Git 服务器。如果你从这里克隆，Git 会自动为你将此远程仓库命名为 `origin`，并下载其中所有的数据，建立一个指向它的 `master` 分支的指针，在本地命名为 `origin/master`，但你无法在本地更改其数据。接着，Git 建立一个属于你自己的本地 `master` 分支，始于 `origin` 上 `master` 分支相同的位置，你可以就此开始工作（见图 3-22）：
+
+<center>![](https://git-scm.com/figures/18333fig0322-tn.png)</center>
+
+图 3-22\. 一次 Git 克隆会建立你自己的本地分支 `master` 和远程分支 `origin/master` ，并且将它们都指向 `origin` 上的 `master` 分支。
+
+**如果你在本地 `master` 分支做了些改动，与此同时，其他人向 `git.ourcompany.com` 推送了他们的更新，那么服务器上的 `master` 分支就会向前推进，而与此同时，你在本地的提交历史正朝向不同方向发展。不过只要你不和服务器通讯，你的 `origin/master` 指针仍然保持原位不会移动** （见图 3-23）。
+
+<center>![](https://git-scm.com/figures/18333fig0323-tn.png)</center>
+
+图 3-23\. 在本地工作的同时有人向远程仓库推送内容会让提交历史开始分流。
+
+***可以运行 `git fetch origin` 来同步远程服务器上的数据到本地。该命令首先找到 `origin` 是哪个服务器（本例为 `git.ourcompany.com`），从上面获取你尚未拥有的数据，更新你本地的数据库，然后把 `origin/master` 的指针移到它最新的位置上***（见图 3-24）。
+
+<center>![](https://git-scm.com/figures/18333fig0324-tn.png)</center>
+
+图 3-24\. `git fetch` 命令会更新 remote 索引。
+
+为了演示拥有多个远程分支（在不同的远程服务器上）的项目是如何工作的，我们假设你还有另一个仅供你的敏捷开发小组使用的内部服务器 `git.team1.ourcompany.com`。可以用第二章中提到的 `git remote add` 命令把它加为当前项目的远程分支之一。我们把它命名为 `teamone`，以便代替完整的 Git URL 以方便使用（见图 3-25）。
+
+<center>![](https://git-scm.com/figures/18333fig0325-tn.png)</center>
+
+图 3-25\. 把另一个服务器加为远程仓库
+
+现在你可以用 `git fetch teamone` 来获取小组服务器上你还没有的数据了。由于当前该服务器上的内容是你 `origin` 服务器上的子集，Git 不会下载任何数据，而只是简单地创建一个名为 `teamone/master` 的远程分支，指向 `teamone` 服务器上 `master` 分支所在的提交对象 `31b8e`（见图 3-26）。
+
+<center>![](https://git-scm.com/figures/18333fig0326-tn.png)</center>
+
+图 3-26\. 你在本地有了一个指向 teamone 服务器上 master 分支的索引。
+
+### 推送本地分支
+
+要想和其他人分享某个本地分支，你需要把它推送到一个你拥有写权限的远程仓库。你创建的本地分支不会因为你的写入操作而被自动同步到你引入的远程服务器上，你需要明确地执行推送分支的操作。换句话说，对于无意分享的分支，你尽管保留为私人分支好了，而只推送那些协同工作要用到的特性分支。
+
+如果你有个叫 `serverfix` 的分支需要和他人一起开发，可以运行 `git push (远程仓库名) (分支名)`：
+
+```sh
+$ git push origin serverfix
+Counting objects: 20, done.
+Compressing objects: 100% (14/14), done.
+Writing objects: 100% (15/15), 1.74 KiB, done.
+Total 15 (delta 5), reused 0 (delta 0)
+To git@github.com:schacon/simplegit.git
+ * [new branch]      serverfix -> serverfix
+```
+
+这里其实走了一点捷径。Git 自动把 `serverfix` 分支名扩展为 `refs/heads/serverfix:refs/heads/serverfix`，意为 “取出我在本地的 serverfix 分支，推送到远程仓库的 serverfix 分支中去”。我们将在第九章进一步介绍 `refs/heads/` 部分的细节，不过一般使用的时候都可以省略它。也可以运行 `git push origin serverfix:serverfix` 来实现相同的效果，它的意思是 “上传我本地的 serverfix 分支到远程仓库中去，仍旧称它为 serverfix 分支”。通过此语法，你可以把本地分支推送到某个命名不同的远程分支：若想把远程分支叫作 `awesomebranch`，可以用 `git push origin serverfix:awesomebranch` 来推送数据。
+
+接下来，当你的协作者再次从服务器上获取数据时，他们将得到一个新的远程分支 `origin/serverfix`，并指向服务器上 `serverfix` 所指向的版本：
+
+```sh
+$ git fetch origin
+remote: Counting objects: 20, done.
+remote: Compressing objects: 100% (14/14), done.
+remote: Total 15 (delta 5), reused 0 (delta 0)
+Unpacking objects: 100% (15/15), done.
+From git@github.com:schacon/simplegit
+ * [new branch]      serverfix    -> origin/serverfix
+```
+
+值得注意的是，在 `fetch` 操作下载好新的远程分支之后，你仍然无法在本地编辑该远程仓库中的分支。换句话说，在本例中，你不会有一个新的 `serverfix` 分支，有的只是一个你无法移动的 `origin/serverfix` 指针。
+
+如果要把该远程分支的内容合并到当前分支，可以运行 `git merge origin/serverfix`。如果想要一份自己的 `serverfix` 来开发，可以在远程分支的基础上分化出一个新的分支来：
+
+```sh
+$ git checkout -b serverfix origin/serverfix
+Branch serverfix set up to track remote branch serverfix from origin.
+Switched to a new branch 'serverfix'
+```
+
+这会切换到新建的 `serverfix` 本地分支，其内容同远程分支 `origin/serverfix` 一致，这样你就可以在里面继续开发了。
+
+### 跟踪远程分支
+
+从远程分支 `checkout` 出来的本地分支，称为 _跟踪分支_ (tracking branch)。跟踪分支是一种和某个远程分支有直接联系的本地分支。在跟踪分支里输入 `git push`，Git 会自行推断应该向哪个服务器的哪个分支推送数据。同样，在这些分支里运行 `git pull` 会获取所有远程索引，并把它们的数据都合并到本地分支中来。
+
+在克隆仓库时，Git 通常会自动创建一个名为 `master` 的分支来跟踪 `origin/master`。这正是 `git push` 和 `git pull` 一开始就能正常工作的原因。当然，你可以随心所欲地设定为其它跟踪分支，比如 `origin` 上除了 `master` 之外的其它分支。刚才我们已经看到了这样的一个例子：`git checkout -b [分支名] [远程名]/[分支名]`。如果你有 1.6.2 以上版本的 Git，还可以用 `--track` 选项简化：
+
+```sh
+$ git checkout --track origin/serverfix
+Branch serverfix set up to track remote branch serverfix from origin.
+Switched to a new branch 'serverfix'
+```
+
+要为本地分支设定不同于远程分支的名字，只需在第一个版本的命令里换个名字：
+
+```sh
+$ git checkout -b sf origin/serverfix
+Branch sf set up to track remote branch serverfix from origin.
+Switched to a new branch 'sf'
+```
+
+现在你的本地分支 `sf` 会自动将推送和抓取数据的位置定位到 `origin/serverfix` 了。
+
+### 删除远程分支
+
+如果不再需要某个远程分支了，比如搞定了某个特性并把它合并进了远程的 `master` 分支（或任何其他存放稳定代码的分支），可以用这个非常无厘头的语法来删除它：`git push [远程名] :[分支名]`。如果想在服务器上删除 `serverfix` 分支，运行下面的命令：
+
+```sh
+$ git push origin :serverfix
+To git@github.com:schacon/simplegit.git
+ - [deleted]         serverfix
+```
+
+咚！服务器上的分支没了。你最好特别留心这一页，因为你一定会用到那个命令，而且你很可能会忘掉它的语法。有种方便记忆这条命令的方法：记住我们不久前见过的 `git push [远程名] [本地分支]:[远程分支]` 语法，如果省略 `[本地分支]`，那就等于是在说 “在这里提取空白然后把它变成`[远程分支]`”。
+
+## 分支的变基
+> git checkout -b test # do something   
+> git rebase master # 变基操作，作用相当于git merge, 优化了提交历史   
+> git rebase --onto master server client <!-- 理解 -->  
+
+把一个分支中的修改整合到另一个分支的办法有两种：`merge` 和 `rebase`。在本章我们会学习什么是变基，如何使用变基，为什么变基操作如此富有魅力，以及我们应该在什么情况下使用变基。
+
+### 基本的变基操作
+
+请回顾之前有关合并的一节（见图 3-27），你会看到开发进程分叉到两个不同分支，又各自提交了更新。
+
+<center>![](https://git-scm.com/figures/18333fig0327-tn.png)</center>
+
+图 3-27\. 最初分叉的提交历史。
+
+之前介绍过，最容易的整合分支的方法是 `merge` 命令，它会把两个分支最新的快照（C3 和 C4）以及二者最新的共同祖先（C2）进行三方合并，合并的结果是产生一个新的提交对象（C5）。如图 3-28 所示：
+
+<center>![](https://git-scm.com/figures/18333fig0328-tn.png)</center>
+
+图 3-28\. 通过合并一个分支来整合分叉了的历史。
+
+其实，还有另外一个选择：你可以把在 C3 里产生的变化补丁在 C4 的基础上重新打一遍。在 Git 里，这种操作叫做 _变基（rebase）_ 。有了 `rebase` 命令，就可以把在一个分支里提交的改变移到另一个分支里重放一遍。
+
+在上面这个例子中，运行：
+
+```sh
+$ git checkout experiment
+$ git rebase master
+First, rewinding head to replay your work on top of it...
+Applying: added staged command
+```
+
+**它的原理是回到两个分支最近的共同祖先，根据当前分支（也就是要进行变基的分支 `experiment`）后续的历次提交对象（这里只有一个 C3），生成一系列文件补丁，然后以基底分支（也就是主干分支 `master`）最后一个提交对象（C4）为新的出发点，逐个应用之前准备好的补丁文件，最后会生成一个新的合并提交对象（C3'），从而改写 `experiment` 的提交历史，使它成为 `master` 分支的直接下游** 如图 3-29 所示：
+
+<center>![](https://git-scm.com/figures/18333fig0329-tn.png)</center>
+
+**图 3-29\. 把 C3 里产生的改变到 C4 上重演一遍。**
+
+现在回到 `master` 分支，进行一次快进合并（见图 3-30）：
+
+<center>![](https://git-scm.com/figures/18333fig0330-tn.png)</center>
+
+图 3-30\. master 分支的快进。
+
+现在的 C3' 对应的快照，其实和普通的三方合并，即上个例子中的 C5 对应的快照内容一模一样了。 ***虽然最后整合得到的结果没有任何区别，但变基能产生一个更为整洁的提交历史。如果视察一个变基过的分支的历史记录，看起来会更清楚：仿佛所有修改都是在一根线上先后进行的，尽管实际上它们原本是同时并行发生的。***
+
+一般我们使用变基的目的，是想要得到一个能在远程分支上干净应用的补丁 — 比如某些项目你不是维护者，但想帮点忙的话，最好用变基：先在自己的一个分支里进行开发，当准备向主项目提交补丁的时候，根据最新的 `origin/master` 进行一次变基操作然后再提交，这样维护者就不需要做任何整合工作（译注：实际上是把解决分支补丁同最新主干代码之间冲突的责任，化转为由提交补丁的人来解决。），只需根据你提供的仓库地址作一次快进合并，或者直接采纳你提交的补丁。
+
+**请注意，合并结果中最后一次提交所指向的快照，无论是通过变基，还是三方合并，都会得到相同的快照内容，只不过提交历史不同罢了。变基是按照每行的修改次序重演一遍修改，而合并是把最终结果合在一起。**
+
+### 有趣的变基
+
+变基也可以放到其他分支进行，并不一定非得根据分化之前的分支。以图 3-31 的历史为例，我们为了给服务器端代码添加一些功能而创建了特性分支 `server`，然后提交 C3 和 C4。然后又从 C3 的地方再增加一个 `client` 分支来对客户端代码进行一些相应修改，所以提交了 C8 和 C9。最后，又回到 `server` 分支提交了 C10。
+
+<center>![](https://git-scm.com/figures/18333fig0331-tn.png)</center>
+
+图 3-31\. 从一个特性分支里再分出一个特性分支的历史。
+
+<p style="background-color:blanchedalmond;font:bold 18px 华文新魏,arial;">假设在接下来的一次软件发布中，我们决定先把客户端的修改并到主线中，而暂缓并入服务端软件的修改（因为还需要进一步测试）。这个时候，我们就可以把基于 `client` 分支而非 `server` 分支的改变（即 C8 和 C9），跳过 `server` 直接放到 `master` 分支中重演一遍，但这需要用 `git rebase` 的 `--onto` 选项指定新的基底分支 `master`：</p>
+
+```sh
+$ git rebase --onto master server client
+```
+
+这好比在说：“取出 `client` 分支，找出 `client` 分支和 `server` 分支的共同祖先之后的变化，然后把它们在 `master` 上重演一遍”。是不是有点复杂？不过它的结果如图 3-32 所示，非常酷 **（译注：虽然 `client` 里的 C8, C9 在 C3 之后，但这仅表明时间上的先后，而非在 C3 修改的基础上进一步改动，因为 `server` 和 `client` 这两个分支对应的代码应该是两套文件，虽然这么说不是很严格，但应理解为在 C3 时间点之后，对另外的文件所做的 C8，C9 修改，放到主干重演。）** ：
+
+<center>![](https://git-scm.com/figures/18333fig0332-tn.png)</center>
+
+图 3-32\. 将特性分支上的另一个特性分支变基到其他分支。
+
+现在可以快进 `master` 分支了（见图 3-33）：
+
+```sh
+$ git checkout master
+$ git merge client
+```
+
+<center>![](https://git-scm.com/figures/18333fig0333-tn.png)</center>
+
+图 3-33\. 快进 master 分支，使之包含 client 分支的变化。
+
+现在我们决定把 `server` 分支的变化也包含进来。我们可以直接把 `server` 分支变基到 `master`，而不用手工切换到 `server` 分支后再执行变基操作 — `git rebase [主分支] [特性分支]` 命令会先取出特性分支 `server`，然后在主分支 `master` 上重演：
+
+```sh
+$ git rebase master server
+```
+
+于是，`server` 的进度应用到 `master` 的基础上，如图 3-34 所示：
+
+<center>![](https://git-scm.com/figures/18333fig0334-tn.png)</center>
+
+图 3-34\. 在 master 分支上变基 server 分支。
+
+然后就可以快进主干分支 `master` 了：
+
+```sh
+$ git checkout master
+$ git merge server
+```
+
+现在 `client` 和 `server` 分支的变化都已经集成到主干分支来了，可以删掉它们了。最终我们的提交历史会变成图 3-35 的样子：
+
+```sh
+$ git branch -d client
+$ git branch -d server
+```
+
+<center>![](https://git-scm.com/figures/18333fig0335-tn.png)</center>
+
+图 3-35\. 最终的提交历史
+
+### 变基的风险
+
+呃，奇妙的变基也并非完美无缺，要用它得遵守一条准则：
+
+***一旦分支中的提交对象发布到公共仓库，就千万不要对该分支进行变基操作。***
+
+如果你遵循这条金科玉律，就不会出差错。否则，人民群众会仇恨你，你的朋友和家人也会嘲笑你，唾弃你。
+
+在进行变基的时候，实际上抛弃了一些现存的提交对象而创造了一些类似但不同的新的提交对象。如果你把原来分支中的提交对象发布出去，并且其他人更新下载后在其基础上开展工作，而稍后你又用 `git rebase` 抛弃这些提交对象，把新的重演后的提交对象发布出去的话，你的合作者就不得不重新合并他们的工作，这样当你再次从他们那里获取内容时，提交历史就会变得一团糟。
+
+下面我们用一个实际例子来说明为什么公开的变基会带来问题。假设你从一个中央服务器克隆然后在它的基础上搞了一些开发，提交历史类似图 3-36 所示：
+
+<center>![](https://git-scm.com/figures/18333fig0336-tn.png)</center>
+
+图 3-36\. 克隆一个仓库，在其基础上工作一番。
+
+现在，某人在 C1 的基础上做了些改变，并合并他自己的分支得到结果 C6，推送到中央服务器。当你抓取并合并这些数据到你本地的开发分支中后，会得到合并结果 C7，历史提交会变成图 3-37 这样：
+
+<center>![](https://git-scm.com/figures/18333fig0337-tn.png)</center>
+
+图 3-37\. 抓取他人提交，并入自己主干。
+
+接下来，那个推送 C6 上来的人决定用变基取代之前的合并操作；继而又用 `git push --force` 覆盖了服务器上的历史，得到 C4'。而之后当你再从服务器上下载最新提交后，会得到：
+
+<center>![](https://git-scm.com/figures/18333fig0338-tn.png)</center>
+
+图 3-38\. 有人推送了变基后得到的 C4'，丢弃了你作为开发基础的 C4 和 C6。
+
+下载更新后需要合并，但此时变基产生的提交对象 C4'的 SHA-1 校验值和之前 C4 完全不同，所以 Git 会把它们当作新的提交对象处理，而实际上此刻你的提交历史 C7 中早已经包含了 C4 的修改内容，于是合并操作会把 C7 和 C4' 合并为 C8（见图 3-39）:
+
+<center class="">![](https://git-scm.com/figures/18333fig0339-tn.png)</center>
+
+图 3-39\. 你把相同的内容又合并了一遍，生成一个新的提交 C8。
+
+C8 这一步的合并是迟早会发生的，因为只有这样你才能和其他协作者提交的内容保持同步。而在 C8 之后，你的提交历史里就会同时包含 C4 和 C4'，两者有着不同的 SHA-1 校验值，如果用 `git log` 查看历史，会看到两个提交拥有相同的作者日期与说明，令人费解。而更糟的是，当你把这样的历史推送到服务器后，会再次把这些变基后的提交引入到中央服务器，进一步困扰其他人（译注：这个例子中，出问题的责任方是那个发布了 C6 后又用变基发布 C4' 的人，其他人会因此反馈双重历史到共享主干，从而混淆大家的视听。）。
+
+如果把变基当成一种在推送之前清理提交历史的手段，而且仅仅变基那些尚未公开的提交对象，就没问题。如果变基那些已经公开的提交对象，并且已经有人基于这些提交对象开展了后续开发工作的话，就会出现叫人沮丧的麻烦。
