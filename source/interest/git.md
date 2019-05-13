@@ -3,36 +3,64 @@ title: git
 date: 2019-05-06 15:15:21
 ---
 # git使用
->git push --help
+>git help pull
 
-## create a new repository on the command line
-```
+## create a new repository
+```sh
 git init
 git add README.md
+git rm -r --cached .
 git commit -m "first commit"
 git remote add origin git@github.com:guanyuespace/OK.git
 git push -u origin master
+git pull --allow-unrelated-histories
+
+git checkout -b test
+
+git push remote-name local-branch-name
+git push remote-name local-branch-name:remote-branch-name
+git push remote-name :remote-branch-name                    # 删除远程分支
+
+git fetch remote-name
+git checkout --track remote-name/remote-branch-name
+git checkout -b new-local-branch-name remote-name/remote-branch-name
+
+git checkout -b test # do something
+git rebase master # 变基操作，作用相当于git merge, 优化了提交历史
+git rebase --onto master server client
+
+git log --abbrev-commit --pretty=oneline # commit-log查看
+
+git stash   # 切换分支时保留暂存而不想进行提交
+git stash save . "comments"
+git stash list
+git stash apply stash@{0} # stash@{0}获取最新的存储,stash@{1}获取次新.stash@{2.hour.ago}获取两小时之前的. 存储可以直接通过索引的位置来获得stash@{n}.
+git stash drop stash@{0}
+```
+## commit
+```sh
+git commit --amend --author='guanyuespace <guanyue003@gmail.com>'
 ```
 ##  push an existing repository from the command line
-```
+```sh
 git remote add origin git@github.com:guanyuespace/OK.git
 git push -u origin master
 ```
 
-
-## .gitignore
 ### git忽略规则
-```
+```sh
 #此为注释 – 内容被 Git 忽略
-.sample 　　 # 忽略所有 .sample 结尾的文件
-!lib.sample 　　 # 但 lib.sample 除外
-/TODO 　　 # 仅仅忽略项目根目录下的 TODO 文件，不包括 subdir/TODO
-build/ 　　 # 忽略 build/ 目录下的所有文件
-doc/*.txt 　　# 会忽略 doc/notes.txt 但不包括 doc/server/arch.txt
+.sample 　　      # 忽略所有 .sample 结尾的文件
+!lib.sample 　　  # 但 lib.sample 除外
+/TODO 　　        # 仅仅忽略项目根目录下的 TODO 文件，不包括 subdir/TODO
+build/ 　　       # 忽略 build/ 目录下的所有文件
+build/*           # 忽略build以及其子目录下的所有文件
+doc/*.txt 　　    # 会忽略 doc/notes.txt 但不包括 doc/server/arch.txt
 ```
+
 ### .gitignore规则不生效的解决办法
 把某些目录或文件加入忽略规则，按照上述方法定义后发现并未生效，原因是.gitignore只能忽略那些原来没有被追踪的文件，如果某些文件已经被纳入了版本管理中，则修改.gitignore是无效的。那么解决方法就是先把本地缓存删除（改变成未被追踪状态），然后再提交：
-```shell
+```sh
 git rm -r --cached .
 git add .
 git commit -m 'update .gitignore'
@@ -46,40 +74,40 @@ git commit -m 'update .gitignore'
 >git help command: git help config
 
 ```sh
-- git init
-- git clone git@github.com:guanyuespace/OK.git MyDirName
+git init
+git clone git@github.com:guanyuespace/OK.git MyDirName
 
-- git status # 简略查看暂存中做出了哪些更改
-- git diff # 查看尚未暂存的文件更新了哪些部分
-- git diff --cached # 已经暂存起来的文件和上次提交时的快照之间的差异
-- git diff --staged # 同上 --cached
+git status # 简略查看暂存中做出了哪些更改
+git diff # 查看尚未暂存的文件更新了哪些部分
+git diff --cached # 已经暂存起来的文件和上次提交时的快照之间的差异
+git diff --staged # 同上 --cached
 
-- git commit -m "comments here"
-- git commit -a # 跳过git add
+git commit -m "comments here"
+git commit -a # 跳过git add
 
-- git rm --cached readme.md # 删除暂存区而不删除本地文件，删除误添加本地文件
-- git rm \*~
+git rm --cached readme.md # 删除暂存区而不删除本地文件，删除误添加本地文件
+git rm \*~
 
-- git mv file_from file_to # Git 并不跟踪文件移动操作,just like: mv file_from file_to; git rm file_from; git add file_to  
-- git mv readme.md README.md
+git mv file_from file_to # Git 并不跟踪文件移动操作,just like: mv file_from file_to; git rm file_from; git add file_to  
+git mv readme.md README.md
 
-- git log # 显示所有提交历史commit-id(sha-1)
-- git log --max-count 2 # 显示最近的两次提交历史（行层面的对比，+,-）
-- git log -U1 --word-diff # 单词层面的对比
-- git log -stat # 摘要：显示更改的行数
-- git log --pretty "格式" # 自定义格式显示提交变化
+git log # 显示所有提交历史commit-id(sha-1)
+git log --max-count 2 # 显示最近的两次提交历史（行层面的对比，+,-）
+git log -U1 --word-diff # 单词层面的对比
+git log -stat # 摘要：显示更改的行数
+git log --pretty "格式" # 自定义格式显示提交变化
 
-- git show commit-id # git show sha-1_code 显示本次提交的更改    
+git show commit-id # git show sha-1_code 显示本次提交的更改    
 
-- git commit --amend # 减少提交次数
+git commit --amend # 减少提交次数
 
-- git reset HEAD README.md # 撤销暂存中README.md的修改
-- git checkout  -- README.md # 撤销本地文件中本次的更改！！！
+git reset HEAD README.md # 撤销暂存中README.md的修改
+git checkout  -README.md # 撤销本地文件中本次的更改！！！
 
-- git remote add shortname url # 添加远程仓库
+git remote add shortname url # 添加远程仓库
 
-- git tag # 显示所有标签
-- git tag -l 'v0.0.*' # 列出:v0.0.1 v0.0.2 ....
+git tag # 显示所有标签
+git tag -l 'v0.0.*' # 列出:v0.0.1 v0.0.2 ....
 ```
 
 
@@ -306,18 +334,18 @@ gpg: Good signature from "guanyue (generate gpg-key test) <guanyue003@gmail.com>
 # 远程仓库
 
 ```sh
-- git remote # 显示**远程仓库**     shortname
-- git remote -v # 显示**远程仓库**  shortname url
+git remote # 显示**远程仓库**     shortname
+git remote -v # 显示**远程仓库**  shortname url
 
-- git fetch shortname # 获取远程仓库的更改，拉取到本地仓库而非本地目录
-- git pull # 获取远程更改到本地文件
+git fetch shortname # 获取远程仓库的更改，拉取到本地仓库而非本地目录
+git pull # 获取远程更改到本地文件
 
-- git push remote-name branch-name # 本地仓库中的数据推送到远程仓库 remote-name:shortname
+git push remote-name branch-name # 本地仓库中的数据推送到远程仓库 remote-name:shortname
 
-- git remote show remote-name # 远程仓库信息
+git remote show remote-name # 远程仓库信息
 
-- git remote rename remote-name new-remote-name # 修改远程仓库shortname
-- git remote rm remote-name # 删除远程仓库
+git remote rename remote-name new-remote-name # 修改远程仓库shortname
+git remote rm remote-name # 删除远程仓库
 ```
 
 ---
