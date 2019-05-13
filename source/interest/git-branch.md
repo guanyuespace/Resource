@@ -281,13 +281,7 @@ no changes added to commit (use "git add" and/or "git commit -a")
 任何包含未解决冲突的文件都会以未合并（unmerged）的状态列出。Git 会在有冲突的文件里加入标准的冲突解决标记，可以通过它们来手工定位并解决这些冲突。可以看到此文件包含类似下面这样的部分：<!-- 直接手动修改，进行取舍 -->
 
 ```html
-<<<<<<< HEAD
 <div id="footer">contact : email.support@github.com</div>
-=======
-<div id="footer">
-  please contact us at support@github.com
-</div>
->>>>>>> iss53
 
 ```
 
