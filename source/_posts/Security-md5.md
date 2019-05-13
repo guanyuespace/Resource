@@ -2,12 +2,12 @@
 title: Security-md5
 date: 2019-02-13 11:23:42
 categories:
-- java
-- security
-- encryption
+- Java
+- Security
+- Encryption
 tags:
-- encryption
-- decryption
+- Encryption
+- Decryption
 ---
 # 哈希算法-MD5,SHA  
 Hash，就是把任意长度的输入（又叫做预映射pre-image）通过散列算法变换成固定长度的输出，该输出就是散列值。这种转换是一种压缩映射，也就是，散列值的空间通常远小于输入的空间。**简单的说就是一种将任意长度的消息压缩到某一固定长度的消息摘要的函数。**  

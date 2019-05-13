@@ -2,12 +2,12 @@
 title: Security-Base64
 date: 2019-02-13 10:53:54
 categories:
-- java
-- security
-- encryption
+- Java
+- Security
+- Encryption
 tags:
-- encryption
-- decryption
+- Encryption
+- Decryption
 ---
 # Base64  
 Base64是网络上最常见的用于传输8Bit字节码的编码方式之一，Base64就是一种基于64个可打印字符来表示二进制数据的方法。

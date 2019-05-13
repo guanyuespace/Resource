@@ -2,13 +2,13 @@
 title: Security-AES
 date: 2019-02-13 10:27:32  
 categories:  
-- java
-- security
-- encryption
+- Java
+- Security
+- Encryption
 
 tags:  
-- encryption
-- decryption
+- Encryption
+- Decryption
 ---
 # AES
 分组加密算法，对称加密算法
