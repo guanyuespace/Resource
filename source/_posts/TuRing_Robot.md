@@ -19,7 +19,7 @@ tags:
 UTF-8（调用图灵API的各个环节的编码方式均为UTF-8）      
 POST: http://openapi.tuling123.com/openapi/api/v2    
 req_str:  
-```json
+```js
 {
 	"reqType":0,/*请求的数据类型,0:文本数据;1:图片;2:音频*/
     "perception": {/*	输入信息*/
@@ -51,7 +51,7 @@ req_str:
 
 ### Response
 
-```json
+```js
 {
    "intent": {/*请求意图*/
        "code": 10005,/*输出功能code*/
@@ -118,72 +118,106 @@ req_str:
 >AES数据加密PCS5Padding,128,iv="00000..."
 
 待加密数据同上，简记为`paramStr`    
+<br/>
 
-### 加密密钥`key`
-
-1. MD5HexStr =  HexStr(MD5(secret+timestamp+apiKey))
-2. key = MD5(MD5HexStr.getBytes("utf-8"))  <!-- 骚操作！！！ -->
+<p style="background-color:lime;font:bold 18px arial;">
+生成加密密钥`key`    
+1.MD5HexStr =  HexStr(MD5(secret+timestamp+apiKey))   
+2.key = MD5(MD5HexStr.getBytes("utf-8"))  <!-- 骚操作！！！ -->
+</p>
 
 ### 加密
-Mode: AES/CBC/PKCS5Padding
-Key: new SecretKeySpec(key, "AES");
+Mode: AES/CBC/PKCS5Padding    
+Key: new SecretKeySpec(key, "AES");      <!-- 16字节128位 --><!-- md5摘要16字节 -->
 
 AES_Encrypt(paramStr)
 
 ### 样例
+>Web_WeChat/src/main/java/info/TuRingRequestEncrypted
 
 ```java
-/**
- * 文本信息处理
- *
- * @param paramStr
- */
-public TuRingRequestEncrypted(String paramStr) {
+public class TuRingRequestEncrypted {
+    private String secret = Secret.secret;
+    private String apiKey = Secret.apiKey;
+    private String timestamp;
+    private String data;
+
+    private String md5Key;
+    private String paramStr;
+
+    /*明文数据请求构造
     TuRingRequest tuRingRequest = new TuRingRequest(0);
     tuRingRequest.setUserInfo(new UserInfo());
-    tuRingRequest.setPerception(new Perception(new Perception.InputText(paramStr), new Perception.SelfInfo(new Perception.SelfInfo.Location("深圳"))));//数据构造
-    this.paramStr = JSON.toJSONString(tuRingRequest);//待加密数据
-    this.timestamp = "" + System.currentTimeMillis();
-    this.md5Key = processKey(secret, timestamp, apiKey);
-    this.data = AES_Encrypted(this.paramStr, md5Key);
-}
+    tuRingRequest.setPerception(new Perception(
+    new Perception.InputText("你在哪？"),
+    new Perception.SelfInfo(new Perception.SelfInfo.Location("深圳"))));
 
-private String AES_Encrypted(String paramStr, String md5Key) {
-    Cipher cipher = null;
-    try {
-        MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-        messageDigest.update(md5Key.getBytes("utf-8"));
-        byte[] tmp = messageDigest.digest();
-        Key key = new SecretKeySpec(tmp, "AES");
-        cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
-        byte[] encryptedData = cipher.doFinal(paramStr.getBytes("utf-8"));
-        return Base64.getEncoder().encodeToString(encryptedData);
-    } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | UnsupportedEncodingException | IllegalBlockSizeException | BadPaddingException e) {
-        e.printStackTrace();
-    }
-    return null;
-}
+    //生成加密数据
+    TuRingRequestEncrypted tuRingRequestEncrypted = new TuRingRequestEncrypted(tuRingRequest);
+    String paramStr = JSON.toJSONString(tuRingRequestEncrypted);//ok
+    */
 
-private String processKey(String secret, String timestamp, String apiKey) {
-    try {
-        MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-        return byte2HexStr(messageDigest.digest((secret + timestamp + apiKey).getBytes("utf-8")));
-    } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-        e.printStackTrace();
+    /**
+     * 文本信息处理
+     *
+     * @param tuRingRequest 数据请求，明文
+     */
+    public TuRingRequestEncrypted(TuRingRequest tuRingRequest) {
+        this.paramStr = JSON.toJSONString(tuRingRequest);
+        this.timestamp = "" + System.currentTimeMillis();
+        this.md5Key = processKey(secret, timestamp, apiKey);
+        this.data = AES_Encrypted(this.paramStr, md5Key);
     }
-    return null;
-}
 
-private String byte2HexStr(byte[] digest) {
-    String str = "0123456789abcdef";
-    StringBuilder stringBuilder = new StringBuilder(2 * digest.length);
-    for (int i = 0; i < digest.length; i++) {
-        byte high = (byte) ((byte) 0x0f & (digest[i] >> 4));
-        stringBuilder.append(str.charAt(high));
-        byte low = (byte) (digest[i] & 0x0f);
-        stringBuilder.append(str.charAt(low));
+    private String AES_Encrypted(String paramStr, String md5Key) {
+        Cipher cipher = null;
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            messageDigest.update(md5Key.getBytes(StandardCharsets.UTF_8));
+            byte[] tmp = messageDigest.digest();
+            Key key = new SecretKeySpec(tmp, "AES");
+            cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}));
+            byte[] encryptedData = cipher.doFinal(paramStr.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(encryptedData);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
-    return stringBuilder.toString();
+
+    private String processKey(String secret, String timestamp, String apiKey) {
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
+            return byte2HexStr(messageDigest.digest((secret + timestamp + apiKey).getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String byte2HexStr(byte[] digest) {
+        String str = "0123456789abcdef";
+        StringBuilder stringBuilder = new StringBuilder(2 * digest.length);
+        for (int i = 0; i < digest.length; i++) {
+            byte high = (byte) ((byte) 0x0f & (digest[i] >> 4));
+            stringBuilder.append(str.charAt(high));
+            byte low = (byte) (digest[i] & 0x0f);
+            stringBuilder.append(str.charAt(low));
+        }
+        return stringBuilder.toString();
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public String getKey() {
+        return apiKey;
+    }
 }
 ```
