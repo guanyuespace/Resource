@@ -15,14 +15,15 @@ tags:
 
 1. 每个节点要么是红色，要么是黑色。
 2. 根节点必须是黑色
-3. 红色节点不能连续（也即是，红色节点的孩子和父亲都不能是红色）。<!-- 3. 每个红色节点的两个子节点都是黑色。(从每个叶子到根的所有路径上不能有两个连续的红色节点); -->    
-4. **对于每个节点，从该点至null（树尾端）的任何路径，都含有相同个数的黑色节点。**<!-- 黑高：限制了任意一条路径不能比另一路径长2倍以上   例：{黑高=4 【最短：黑，黑，黑，黑】  【最长：黑，红，黑，红，黑，红，黑 】}-->   
+3. 每个外节点（nil）是黑色的
+4. 红色节点不能连续（也即是，红色节点的孩子和父亲都不能是红色）。<!-- 3. 每个红色节点的两个子节点都是黑色。(从每个叶子到根的所有路径上不能有两个连续的红色节点); -->    
+5. **从某一结点到达其子孙外节点的每一条简单路径上包含相同个数的黑节点。**<!-- 黑高：限制了任意一条路径不能比另一路径长2倍以上   例：{黑高=4 【最短：黑，黑，黑，黑】  【最长：黑，红，黑，红，黑，红，黑，红】}  ，此表示为一般不含nil哨位外节点。   -->   
 
-<!-- 《数据结构》中存在外界点nil且全部为黑色节点,bh(T*)：黑高 -->
+<!-- 《数据结构》中存在外界点nil且全部为黑色节点,bh(T*)：黑高--将从节点X出发 ~~（不包括该节点）~~ 到达一个外节点的任意路径上黑色节点的个数称为该节点的黑高，用bh(x)表示。根节点则为树黑高 -->
 
-![红黑树示例](TreeMap_base.png "红黑树示例")
-
-<font size="-2">注：在树的结构发生改变时（插入或者删除操作），往往会破坏上述条件3或条件4，需要通过调整使得查找树重新满足红黑树的约束条件。</font>
+![红黑树示例，不含哨位节点nil](TreeMap_base.png "红黑树示例，不含哨位节点nil")
+<font  size="-2">红黑树定义摘自《数据结构》第二版,刘大有</font>
+<font size="-2">注：在树的结构发生改变时（插入或者删除操作），往往会破坏上述条件4或条件5，需要通过调整使得查找树重新满足红黑树的约束条件。</font>
 
 <!-- more -->
 
@@ -32,16 +33,22 @@ tags:
 前文说到当查找树的结构发生改变时，红黑树的约束条件可能被破坏，需要通过调整使得查找树重新满足红黑树的约束条件。调整可以分为两类：一类是颜色调整，即改变某个节点的颜色；另一类是结构调整，集改变检索树的结构关系。结构调整过程包含两个基本操作：左旋（Rotate Left），右旋（RotateRight）。
 
 ### 节点定义
+
 ```java
-private static final boolean RED   = false;
-private static final boolean BLACK = true;
-static final class Entry<K,V> implements Map.Entry<K,V> {
+class TreeMap{
+  // ....
+  private static final boolean RED   = false;
+  private static final boolean BLACK = true;
+
+  // ...
+  static final class Entry<K,V> implements Map.Entry<K,V> {
     K key;
     V value;
     Entry<K,V> left;
     Entry<K,V> right;
     Entry<K,V> parent;
     boolean color = BLACK;
+  }
 }
 ```   
 
@@ -212,24 +219,24 @@ private void fixAfterInsertion(Entry<K,V> x) {
    while (x != null && x != root && x.parent.color == RED) {//根节点黑色，红色父节点的子节点黑色
        if (parentOf(x) == leftOf(parentOf(parentOf(x)))) {//parentOf: return (p == null ? null: p.parent);
                                                           // leftOf: return (p == null) ? null: p.left;
-           Entry<K,V> y = rightOf(parentOf(parentOf(x)));
-           if (colorOf(y) == RED) {
-               setColor(parentOf(x), BLACK);
-               setColor(y, BLACK);
+           Entry<K,V> y = rightOf(parentOf(parentOf(x)));//叔叔节点
+           if (colorOf(y) == RED) {//叔叔节点为红色
+               setColor(parentOf(x), BLACK);//p(x),y黑色  p(p(x)) 红  
+               setColor(y, BLACK);//情况，问题上移至p(p(x))
                setColor(parentOf(parentOf(x)), RED);
                x = parentOf(parentOf(x));
-           } else {
-               if (x == rightOf(parentOf(x))) {
+           } else {//叔叔节点为黑色
+               if (x == rightOf(parentOf(x))) {//x为右节点 情况2-1-3
                    x = parentOf(x);
-                   rotateLeft(x);//
-               }
-               setColor(parentOf(x), BLACK);
+                   rotateLeft(x);//以p(x)为轴左旋
+               }//变成情况2-1-2
+               setColor(parentOf(x), BLACK);//p(x) 黑 p(p(x)) 红
                setColor(parentOf(parentOf(x)), RED);
-               rotateRight(parentOf(parentOf(x)));
+               rotateRight(parentOf(parentOf(x)));//以p(p(x))为轴右旋
            }
-       } else {
+       } else {//情况2-2
            Entry<K,V> y = leftOf(parentOf(parentOf(x)));
-           if (colorOf(y) == RED) {
+           if (colorOf(y) == RED) {//情况2-2-1 ...
                setColor(parentOf(x), BLACK);
                setColor(y, BLACK);
                setColor(parentOf(parentOf(x)), RED);
@@ -250,8 +257,39 @@ private void fixAfterInsertion(Entry<K,V> x) {
 ```
 红黑树颜色调整
 
+<!-- Later -->
 
-Later
+当插入节点为红色节点时则性质1， 3， 5永远成立，只有性质2：根节点黑色，性质4：红色节点不连续会被破坏。
+
+待插入节点位节点Z，父亲节点p(Z)   
+
+情况1. 如果Z为根节点，则原树为空，则性质2被破坏    
+情况2. 如果p(Z)为红色，则性质4被破坏    
+
+细分具体情况：
+```   
+情况1. Z为根节点，着色为红色   
+情况2-1. p(Z)为红色，p(Z)是p(p(Z))的左孩子。   
+  情况2-1-1. p(Z)为红色，p(Z)是p(p(Z))的左孩子，z的叔叔节点y为红色。    
+  情况2-1-2. p(Z)为红色，p(Z)是p(p(Z))的左孩子，z的叔叔节点y为黑色而且z为左孩子。    
+  情况2-1-3. p(Z)为红色，p(Z)是p(p(Z))的左孩子，z的叔叔节点y为黑色而且z为右孩子。  
+情况2-2. p(Z)为红色，p(Z)是p(p(Z))的右孩子。   
+  情况2-2-1. p(Z)为红色，p(Z)是p(p(Z))的右孩子，z的叔叔节点y为红色。    
+  情况2-2-2. p(Z)为红色，p(Z)是p(p(Z))的右孩子，z的叔叔节点y为黑色而且z为左孩子。    
+  情况2-2-3. p(Z)为红色，p(Z)是p(p(Z))的右孩子，z的叔叔节点y为黑色而且z为右孩子。  
+```
+具体情况具体调整：   
+1. 情况1. 着色为黑色OK  
+2.1. **情况2-1. p(Z)为红色，p(Z)是p(p(Z))的左孩子。**
+2.1.1. ***情况2-1-1. p(Z)为红色，p(Z)是p(p(Z))的左孩子，z的叔叔节点y为红色。***   
+**p(Z)，y 黑   p(p(Z)) 红**    
+2.1.2. ***情况2-1-2. p(Z)为红色，p(Z)是p(p(Z))的左孩子，z的叔叔节点y为黑色而且z为左孩子。***      
+**p(Z) 黑 p(p(Z)) 红 以p(p(Z))为轴右旋**     
+2.1.3. ***情况2-1-3. p(Z)为红色，p(Z)是p(p(Z))的左孩子，z的叔叔节点y为黑色而且z为右孩子。***     
+**以p(Z)为轴左旋,转换成情况2-1-2**   
+
+![](insert.jpg "插入操作")
+<!--  4节点(Z,p(Z),p(p(Z)),叔叔节点y)最终稳定形态 ①...②... -->
 
 ## 删除节点
 >左右子树
@@ -266,7 +304,6 @@ Later
 >我们并不关心最终被删除的节点是否是我们开始想要删除的那个节点，只要节点里的值最终被删除就行了，至于树结构如何变化，这个并不重要。   
 
 
-
 ```java
 /**
  * Delete node p, and then rebalance the tree.
@@ -277,7 +314,7 @@ private void deleteEntry(Entry<K,V> p) {
 
     // If strictly internal, copy successor's element to p and then make p
     // point to successor.
-    if (p.left != null && p.right != null) {
+    if (p.left != null && p.right != null) {//当p左右孩子，节点p用后继节点代替
         Entry<K,V> s = successor(p);
         p.key = s.key;
         p.value = s.value;
@@ -301,14 +338,13 @@ private void deleteEntry(Entry<K,V> p) {
         p.left = p.right = p.parent = null;
 
         // Fix replacement
-        if (p.color == BLACK)
+        if (p.color == BLACK)//删除黑色节点... ...
             fixAfterDeletion(replacement);
     } else if (p.parent == null) { // return if we are the only node.
         root = null;
     } else { //  No children. Use self as phantom replacement and unlink.
         if (p.color == BLACK)
             fixAfterDeletion(p);
-
         if (p.parent != null) {
             if (p == p.parent.left)
                 p.parent.left = null;
@@ -319,6 +355,7 @@ private void deleteEntry(Entry<K,V> p) {
     }
 }
 ```
+结构调整... ...
 
 ### 颜色调整
 
@@ -387,6 +424,16 @@ private void fixAfterDeletion(Entry<K,V> x) {
 }
 ```
 
+待删除节点y
+
+1. 删除节点为红色(ok)
+
+
+2. 删除节点为黑色(黑高-1，红色节点变连续)
+2.1. y为根节点
+2.2. p(y)与child(y)为红色... ...
+
+
 ---
 <!-- 以下内容部分摘自《数据结构》刘大有... -->
 # 补充
@@ -421,18 +468,19 @@ private void fixAfterDeletion(Entry<K,V> x) {
 
 ### 删除节点
 
-<!-- 相对待删除节点 -->
+<!-- 相对待删除节点q -->
 #### 右子节点为空
-左子节点直接替换ok
+左子节点直接替换ok   
+![](http://cc.jlu.edu.cn/G2S/eWebEditor/uploadfile/20121217103146001.png)  
 
 #### 右子节点的左子节点为空
-左子节点作为右子节点的左子节点
-
+左子节点作为右子节点的左子节点   
+![](http://cc.jlu.edu.cn/G2S/eWebEditor/uploadfile/20121217103146002.png)![](http://cc.jlu.edu.cn/G2S/eWebEditor/uploadfile/20121217103146003.png)   
 
 #### 右子节点的左子节点不空
-
 最左左子节点（即待删除节点的后继节点）替换待删除节点
 最左左子节点的右子节点替换最左左子节点的原位
+![](http://cc.jlu.edu.cn/G2S/eWebEditor/uploadfile/20121217103147004.png)  
 
 ---
 # 拓展
@@ -462,3 +510,7 @@ private void fixAfterDeletion(Entry<K,V> x) {
 ```
 α<=  β（T*）  < 1-α  
 ```
+
+
+## 斐波那契树
+![斐波那契树](fabonacci.jpg "斐波那契树")

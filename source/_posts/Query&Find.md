@@ -21,7 +21,7 @@ low, mid, high
 内路径和：I<sub>N</sub>  
 外路径和：E<sub>N</sub>  
 
-
+<!-- more -->
 1--N  
 1---- (1+N)/2  --- N
 
