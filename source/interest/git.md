@@ -13,7 +13,7 @@ git rm -r --cached .
 git commit -m "first commit"
 git remote add origin git@github.com:guanyuespace/OK.git
 git push -u origin master
-git pull --allow-unrelated-histories
+git pull --allow-unrelated-histories                        # 远程拉取unrelated histories 
 
 git checkout -b test
 
@@ -46,6 +46,39 @@ git commit --amend --author='guanyuespace <guanyue003@gmail.com>'
 git remote add origin git@github.com:guanyuespace/OK.git
 git push -u origin master
 ```
+
+## multi remote 
+
+```
+.git/config  
+
+[remote "all"]  
+    url = git@github.com:guanyuespace/Resource.git
+    url = git@gitee.com:guanyue003/Resource.git
+    
+    
+git pull all --all # 同时提交到两个远程仓库
+```
+
+![remote信息](./git_remote.jpg)     
+可以看到同时push到两个远程仓库，只从github拉取,ok.... ...
+
+
+### .git文件结构
+
+![.git文件结构](./git_file.jpg ".git文件夹下文件结构")    
+
+| 文件 | desp |
+| --- | --- |
+| logs | commit日志，push-pull信息 |
+| objects | 存储的文件二进制对象 |
+| COMMIT_EDITMSG | recent commit-msg |
+| config | branch, remote-branch |
+| index | 暂存区,二进制文件，stage  |
+
+![config文件内容](./git_config.jpg "git config文件内容")       
+参考：[.git文件夹](https://blog.csdn.net/mayfla/article/details/78653396)     
+
 
 ### git忽略规则
 ```sh
