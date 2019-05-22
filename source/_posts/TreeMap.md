@@ -300,10 +300,10 @@ private void fixAfterInsertion(Entry<K,V> x) {
 >相较于插入操作，红黑树的删除操作则要更为复杂一些。    
 >删除操作首先要确定待删除节点有几个孩子，如果有两个孩子，不能直接删除该节点。   
 >而是要先找到该节点的前驱（该节点左子树中最大的节点）或者后继（该节点右子树中最小的节点），   
->然后将前驱或者后继的值复制到要删除的节点中，最后再将前驱或后继删除。   
+>**然后将前驱或者后继的值复制到要删除的节点中，最后再将前驱或后继删除。**   
 >由于前驱和后继至多只有一个孩子节点，这样我们就把原来要删除的节点有两个孩子的问题转化为只有一个孩子节点的问题，问题被简化了一些。   
 >我们并不关心最终被删除的节点是否是我们开始想要删除的那个节点，只要节点里的值最终被删除就行了，至于树结构如何变化，这个并不重要。   
-
+<!-- 具体分析，参见二叉查找树树节点删除 -->
 
 ```java
 /**
@@ -323,17 +323,16 @@ private void deleteEntry(Entry<K,V> p) {
     } // p has 2 children
 
     // Start fixup at replacement node, if it exists.
-    Entry<K,V> replacement = (p.left != null ? p.left : p.right);
-
-    if (replacement != null) {
+    Entry<K,V> replacement = (p.left != null ? p.left : p.right);//replacement --left ..  right
+    if (replacement != null) {//结构调整...
         // Link replacement to parent
         replacement.parent = p.parent;
         if (p.parent == null)
             root = replacement;
         else if (p == p.parent.left)
-            p.parent.left  = replacement;
+            p.parent.left  = replacement;//ok...
         else
-            p.parent.right = replacement;
+            p.parent.right = replacement;//ok...
 
         // Null out links so they are OK to use by fixAfterDeletion.
         p.left = p.right = p.parent = null;
@@ -434,7 +433,6 @@ private void fixAfterDeletion(Entry<K,V> x) {
 2.1. y为根节点
 2.2. p(y)与child(y)为红色... ...
 
-
 ---
 <!-- 以下内容部分摘自《数据结构》刘大有... -->
 # 补充
@@ -468,6 +466,14 @@ private void fixAfterDeletion(Entry<K,V> x) {
 
 
 ### 删除节点
+>删除操作首先要确定待删除节点有几个孩子，如果有两个孩子，不能直接删除该节点。   
+>而是要先找到该节点的前驱（该节点左子树中最大的节点）或者后继（该节点右子树中最小的节点），   
+>**然后将前驱或者后继的值复制到要删除的节点中，最后再将前驱或后继删除。**   
+>由于前驱和后继至多只有一个孩子节点，这样我们就把原来要删除的节点有两个孩子的问题转化为只有一个孩子节点的问题，问题被简化了一些。  
+>简化：右子节点的左子节点不空以及右子节点的左子节点为空均为简化操作的的实现      
+>我们并不关心最终被删除的节点是否是我们开始想要删除的那个节点，只要节点里的值最终被删除就行了，至于树结构如何变化，这个并不重要。   
+
+## 图示
 
 <!-- 相对待删除节点q -->
 #### 右子节点为空
@@ -482,6 +488,47 @@ private void fixAfterDeletion(Entry<K,V> x) {
 最左左子节点（即待删除节点的后继节点）替换待删除节点
 最左左子节点的右子节点替换最左左子节点的原位
 ![](http://cc.jlu.edu.cn/G2S/eWebEditor/uploadfile/20121217103147004.png)  
+
+## Example
+
+```java
+private void deleteEntry(Entry<K,V> p) {
+    modCount++;
+    size--;
+    if (p.left != null && p.right != null) {//删除点p的左右子树都非空。
+        Entry<K,V> s = successor(p);// 后继
+
+        // 后继节点替换带删除节点
+        p.key = s.key;
+        p.value = s.value;
+
+        p = s;// 问题转换成删除后继节点
+    }
+    Entry<K,V> replacement = (p.left != null ? p.left : p.right);
+    if (replacement != null) {// 待删除节点p只拥有一个节点，replacement为其左or右孩子
+        replacement.parent = p.parent;
+        if (p.parent == null)
+            root = replacement;
+        else if (p == p.parent.left)
+            p.parent.left  = replacement;
+        else
+            p.parent.right = replacement;
+        p.left = p.right = p.parent = null;
+    }
+    // ok ... ...
+    else if (p.parent == null) {// p为根节点
+        root = null;
+    } else { // 删除点p的左右子树都为空
+        if (p.parent != null) {
+            if (p == p.parent.left)
+                p.parent.left = null;
+            else if (p == p.parent.right)
+                p.parent.right = null;
+            p.parent = null;
+        }
+    }
+}
+```
 
 ---
 # 拓展
