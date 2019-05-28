@@ -14,6 +14,8 @@ tags:
 ## 此日无事
 >转载自[原文地址](https://www.jianshu.com/p/7367b358ae92)
 
+<!-- more -->
+
 <div style="background: url(https://p2.music.126.net/gWpJfOAv5TiUOcyCQg3ToA==/109951162919684720.jpg) ; background-repeat:no-repeat;background-size: cover;filter:invert(1) brightness(0.8);color:blue;font:bold 18px 华文新魏; overflow:hidden">
 吾友亲启：<br/>
 见字如晤。<br/>

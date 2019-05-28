@@ -159,15 +159,17 @@ public class HashMap<K,V> extends AbstractMap<K,V>
           this.loadFactor = loadFactor;
           this.threshold = tableSizeFor(initialCapacity);
       }
+      //具体解释参见interest/Integer
       //找到大于initialCapacity最小的2^n
       //tableSizeFor(100)=128;  tableSizeFor(65536)=65536; tableSizeFor(65537)=131072   
       static final int tableSizeFor(int cap) {
-        int n = cap - 1;//最低位1右移一位
-        n |= n >>> 1;//无符号右移，高位补0   +0.5     （|= 类比 加）
-        n |= n >>> 2;//                    +0.25
-        n |= n >>> 4;//                    +0.125
-        n |= n >>> 8;//                    +0.0625
-        n |= n >>> 16;//                   +0.03125
+        int n = cap - 1;//考虑到n本身就是2^n
+        // 最高16位1,从最高的一位1开始算起
+        n |= n >>> 1;//  n的最高位1， |=  最高2位是1
+        n |= n >>> 2;//  n的最高2位1  |=  最高4位是1         
+        n |= n >>> 4;//           
+        n |= n >>> 8;//           
+        n |= n >>> 16;// n的最高16位1 |=  最高32位1    ，即保证了当前数中从最高位1开始之后均为1， n+1即为最小2^n    
         return (n < 0) ? 1 : (n >= MAXIMUM_CAPACITY) ? MAXIMUM_CAPACITY : n + 1;
     }//运算结果： ？？ 1.75*cap
     //int： 32位   （右移1,2,4,8,16使得所有位均为1，later+1 ok-->最小的2^n）
@@ -186,6 +188,8 @@ static class Node<K,V> implements Map.Entry<K,V> {
         this.value = value;
         this.next = next;//hash碰撞链表
     }
+    //to ameliorate impact. collisions
+    public final int hashCode() {return Objects.hashCode(key) ^ Objects.hashCode(value);}
 }
 
 // Tree bins (后续分析。。。)
@@ -266,6 +270,19 @@ final class EntrySet extends AbstractSet<Map.Entry<K,V>> {
 
 ### Put--Remove
 >put()与remove()方法具体实现交由putVal()和removeNode()
+
+#### hash值
+```java
+//创建新节点的hash值计算，因此Node.hash 可能为负
+static final int hash(Object key) {
+     int h;
+     return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+ }
+```
+
+
+#### Put--Remove具体操作
+
 
 ```java
 //初始化&空间不够时，重建table[扩容]
@@ -382,7 +399,9 @@ final Node<K,V>[] resize() {
     }
     return newTab;
 }
-//put(Key,Value)
+// put(Key,Value)
+// putVal(hash(key), key, value, false, evict);
+// putVal(hash(key), key, value, false, false);
 final V putVal(int hash, K key, V value, boolean onlyIfAbsent,
                boolean evict) {
     Node<K,V>[] tab; Node<K,V> p; int n, i;

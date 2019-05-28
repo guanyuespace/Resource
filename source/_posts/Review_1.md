@@ -11,7 +11,7 @@ tag:
 <!-- 有一天，杜康想研制一种可以喝的东西，可是冥思苦想就是想不出制作方法，晚上睡觉的时候做了一个奇怪的梦，他梦见一个鹤发童颜的老翁来到他面前，对他说：“你以水为源，以粮为料，再在粮食泡在水里第九天的酉时找三个人，每人取一滴血加在其中，即成。”说完老翁就不见了。
 杜康醒来就按照老翁说的制作。他在第九天的酉时（5点～7点）到路边寻找三人。不一会来了一个书生，文质彬彬，谦虚有礼，杜康急忙上前说明来意，岂料书生欣然允诺，割破手指滴了一滴血在桶里；书生走后，又来了一队人马，带头的是一位威武英气的将军，杜康上前说明来意，将军也捋臂挽袖，支持杜康，也割破手指滴了一滴血在桶里；这时酉时已经快过了（就是马上到七点了）可杜康还没找到第三个人，他有些着急，转念一想，只要是人不都可以吗，于是他找到了村子里的一个无亲无故并且傻乎乎的乞丐，按住他，扎破他的手指滴了一滴血在桶里，疼的乞丐一会大喊大叫，一会晕头晕脑。有了这三滴血，杜康终于制作成了，可是他又犯愁了，起什么名字呢？他一想，这饮品里有三个人的血，又是酉时滴的，就写作“酒”吧，怎么念呢？这是在第九天做成的，就取同音，念酒（九）吧。这就是关于酒来历的传说。百度百科-->
 <!-- 氿：二简字，酒，已废除！传闻酒是将粮食精华，加上酉时滴到那液体里的三滴血，酿造九天九夜。故此种饮料写作酒，读作九。【于是按照这种缘起，写作“氿”，以达全句无酒，而处处是酒】这里氿读(jiǔ)，与酒同音。-->
-<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=1363408250&auto=1&height=66"></iframe>
+<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=1363408250&auto=0&height=66"></iframe>
 <div style="background-image:url(http://p2.music.126.net/akon6uBnwk1tCC0jqtj74A==/109951163920001562.jpg);background-size:100% 100%;filter:brightness(0.8);">
 <div style="text-align:center;filter:invert(1);mix-blend-mode:difference;font:bold 32px 华文新魏;padding:20px;">
 <p style="font:bold 36px 华文新魏">大氿歌</p>

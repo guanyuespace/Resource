@@ -113,6 +113,7 @@ Using a value of {@code Long.MAX_VALUE} **suppresses all parallelism.**
 Using a value of {@code 1} results in maximal parallelism by partitioning into enough subtasks to fully utilize the {@link ForkJoinPool#commonPool()} that is used for all parallel computations.   
 使用{@代码1 }的值通过划分成足够多的子任务来最大化并行性，以便充分利用{ Link Link FokCuangPooSyPooPoCo（）}，用于所有并行计算。   
 
+<!--
 Normally, you would initially choose one of these extreme values, and then measure performance of using in-between values that trade off overhead versus throughput.   
 通常，您将首先选择这些极值中的一个，然后测量使用开销与吞吐量之间的值之间的使用性能。   
 <p>The concurrency properties of bulk operations follow from those of ConcurrentHashMap: Any non-null result returned from {@code get(key)} and related access methods bears a happens-before relation with the associated insertion or update.   
@@ -151,3 +152,15 @@ Similarly, parallelization may not lead to much actual parallelism if all proces
 同样，如果所有处理器都忙于执行无关的任务，并行化可能不会导致太多实际的并行性。      
 <p>All arguments to all task methods must be non-null.      
 <p>所有任务方法的所有参数都必须为非空。
+-->
+
+Insertion (via put or its variants) of the first node in an empty bin is performed by just CASing it to the bin.  This is by far the most common case for put operations under most key/hash distributions.  
+
+Other update operations (insert, delete, and replace) require locks.  
+We do not want to waste the space required to associate a distinct lock object with each bin, so instead use the first node of a bin list itself as a lock.
+其他更新操作（插入、删除和替换）需要锁。
+我们不想浪费将不同的锁对象与每个bin关联所需的空间，因此使用bin列表本身的第一个节点作为锁。   
+
+---
+# Code
+[ConcurrentHashMap](https://guanyuespace.github.io/2019/05/23/ConcurrentHashMap_code.html)
