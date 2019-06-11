@@ -87,7 +87,6 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
 
 ## Methods
 
-
 ### Node
 ```java
 static class Node<K,V> implements Map.Entry<K,V> {
@@ -280,11 +279,11 @@ private final void addCount(long x, int check) {
         s = sumCount();//
     }
 
-    //check ?
+    //check if the count > sizeCtl (增长)  resize --->
     if (check >= 0) {
         Node<K,V>[] tab, nt; int n, sc;
         while (s >= (long)(sc = sizeCtl) && (tab = table) != null &&
-               (n = tab.length) < MAXIMUM_CAPACITY) {
+               (n = tab.length) < MAXIMUM_CAPACITY) {//ok
             int rs = resizeStamp(n);
             if (sc < 0) {
                 if ((sc >>> RESIZE_STAMP_SHIFT) != rs || sc == rs + 1 ||
@@ -294,8 +293,7 @@ private final void addCount(long x, int check) {
                 if (U.compareAndSwapInt(this, SIZECTL, sc, sc + 1))
                     transfer(tab, nt);
             }
-            else if (U.compareAndSwapInt(this, SIZECTL, sc,
-                                         (rs << RESIZE_STAMP_SHIFT) + 2))
+            else if (U.compareAndSwapInt(this, SIZECTL, sc,(rs << RESIZE_STAMP_SHIFT) + 2))
                 transfer(tab, null);
             s = sumCount();
         }
@@ -303,7 +301,7 @@ private final void addCount(long x, int check) {
 }
 ```
 
-Later
+// Later
 
 
 ### get

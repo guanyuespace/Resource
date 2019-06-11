@@ -3,7 +3,8 @@ title: git
 date: 2019-05-06 15:15:21
 ---
 # git使用
->git help pull
+> git help pull
+> ssh-copy-id -i id_rsa.pub maopengbo@10.8.9.3<!-- 免密连接远程服务器 ok -->
 
 ## create a new repository
 ```sh
@@ -13,7 +14,7 @@ git rm -r --cached .
 git commit -m "first commit"
 git remote add origin git@github.com:guanyuespace/OK.git
 git push -u origin master
-git pull --allow-unrelated-histories                        # 远程拉取unrelated histories 
+git pull --allow-unrelated-histories                        # 远程拉取unrelated histories
 
 git checkout -b test
 
@@ -47,26 +48,26 @@ git remote add origin git@github.com:guanyuespace/OK.git
 git push -u origin master
 ```
 
-## multi remote 
+## multi remote
 
 ```
-.git/config  
+.git/config
 
-[remote "all"]  
+[remote "all"]
     url = git@github.com:guanyuespace/Resource.git
     url = git@gitee.com:guanyue003/Resource.git
-    
-    
+
+
 git pull all --all # 同时提交到两个远程仓库
 ```
 
-![remote信息](./git_remote.jpg)     
+![remote信息](./git_remote.jpg)
 可以看到同时push到两个远程仓库，只从github拉取,ok.... ...
 
 
 ### .git文件结构
 
-![.git文件结构](./git_file.jpg ".git文件夹下文件结构")    
+![.git文件结构](./git_file.jpg ".git文件夹下文件结构")
 
 | 文件 | desp |
 | --- | --- |
@@ -76,8 +77,8 @@ git pull all --all # 同时提交到两个远程仓库
 | config | branch, remote-branch |
 | index | 暂存区,二进制文件，stage  |
 
-![config文件内容](./git_config.jpg "git config文件内容")       
-参考：[.git文件夹](https://blog.csdn.net/mayfla/article/details/78653396)     
+![config文件内容](./git_config.jpg "git config文件内容")
+参考：[.git文件夹](https://blog.csdn.net/mayfla/article/details/78653396)
 
 
 ### git忽略规则
@@ -121,7 +122,7 @@ git commit -a # 跳过git add
 git rm --cached readme.md # 删除暂存区而不删除本地文件，删除误添加本地文件
 git rm \*~
 
-git mv file_from file_to # Git 并不跟踪文件移动操作,just like: mv file_from file_to; git rm file_from; git add file_to  
+git mv file_from file_to # Git 并不跟踪文件移动操作,just like: mv file_from file_to; git rm file_from; git add file_to
 git mv readme.md README.md
 
 git log # 显示所有提交历史commit-id(sha-1)
@@ -130,7 +131,7 @@ git log -U1 --word-diff # 单词层面的对比
 git log -stat # 摘要：显示更改的行数
 git log --pretty "格式" # 自定义格式显示提交变化
 
-git show commit-id # git show sha-1_code 显示本次提交的更改    
+git show commit-id # git show sha-1_code 显示本次提交的更改
 
 git commit --amend # 减少提交次数
 
@@ -148,14 +149,14 @@ git tag -l 'v0.0.*' # 列出:v0.0.1 v0.0.2 ....
 # 打标签
 记录某一时刻的版本，与git commit之间...
 ## 新建标签
-Git 使用的标签有两种类型：轻量级的（lightweight）和含附注的（annotated）。   
-**轻量级标签就像是个不会变化的分支，实际上它就是个指向特定提交对象的引用。**    
-**含附注标签，实际上是存储在仓库中的一个独立对象，** 它有自身的校验和信息，包含着标签的名字，电子邮件地址和日期，以及标签说明.   
-标签本身也允许使用 `GNU Privacy Guard (GPG)` 来签署或验证。   
+Git 使用的标签有两种类型：轻量级的（lightweight）和含附注的（annotated）。
+**轻量级标签就像是个不会变化的分支，实际上它就是个指向特定提交对象的引用。**
+**含附注标签，实际上是存储在仓库中的一个独立对象，** 它有自身的校验和信息，包含着标签的名字，电子邮件地址和日期，以及标签说明.
+标签本身也允许使用 `GNU Privacy Guard (GPG)` 来签署或验证。
 一般我们都建议使用含附注型的标签，以便保留相关信息；当然，如果只是临时性加注标签，或者不需要旁注额外信息，用轻量级标签也没问题。
 
 ## 含附注的标签
-创建一个含附注类型的标签非常简单，用 `-a` （译注：取 `annotated` 的首字母）指定标签名字即可：   
+创建一个含附注类型的标签非常简单，用 `-a` （译注：取 `annotated` 的首字母）指定标签名字即可：
 
 ```sh
 git tag -a v0.0.9 -m 'test version v0.0.9'
@@ -217,11 +218,11 @@ signed by gpg-signature
 ```
 
 ##  轻量级标签
-轻量级标签实际上就是一个保存着对应提交对象的校验和信息的文件。要创建这样的标签，一个 -a，-s 或 -m 选项都不用，直接给出标签名字即可：   
-`$ git tag v1.4-lw`   
+轻量级标签实际上就是一个保存着对应提交对象的校验和信息的文件。要创建这样的标签，一个 -a，-s 或 -m 选项都不用，直接给出标签名字即可：
+`$ git tag v1.4-lw`
 
 ## 分享标签
-默认情况下，`git push` 并不会把标签传送到远端服务器上，只有通过显式命令才能分享标签到远端仓库。其命令格式如同推送分支，运行 `git push [remote-name] [tagname]`,或者一次推送所有标签`git push [remote-name] --tags`    
+默认情况下，`git push` 并不会把标签传送到远端服务器上，只有通过显式命令才能分享标签到远端仓库。其命令格式如同推送分支，运行 `git push [remote-name] [tagname]`,或者一次推送所有标签`git push [remote-name] --tags`
 
 ---
 # GPG
@@ -290,7 +291,7 @@ $ gpg --keyserver hkp://subkeys.pgp.net --send-keys [用户ID] # 上传公钥
 $ gpg --fingerprint [用户 ID] # 签名，自签证明
 
 $ gpg --import [密钥文件]                 # 从密钥文件导入
-$ gpg --keyserver hkp://subkeys.pgp.net --search-keys [用户ID] # 从密钥服务器导入     
+$ gpg --keyserver hkp://subkeys.pgp.net --search-keys [用户ID] # 从密钥服务器导入
 ```
 ## 加解密
 
@@ -307,10 +308,10 @@ $ gpg --clearsign src.txt # 对src.txt生成scaii签名 文件：src.txt.asc
 $ gpg --verify src.asc
 ```
 
-如果想生成单独的签名文件，与文件内容分开存放，可以使用 detach-sign 参数。   
-`gpg --detach-sign demo.txt`    
-运行上面的命令后，当前目录下生成一个单独的签名文件 demo.txt.sig。该文件是二进制形式的，如果想采用 ASCII 码形式，要加上 armor 参数。   
-`gpg --armor --detach-sign demo.txt`   
+如果想生成单独的签名文件，与文件内容分开存放，可以使用 detach-sign 参数。
+`gpg --detach-sign demo.txt`
+运行上面的命令后，当前目录下生成一个单独的签名文件 demo.txt.sig。该文件是二进制形式的，如果想采用 ASCII 码形式，要加上 armor 参数。
+`gpg --armor --detach-sign demo.txt`
 
 
 
@@ -383,7 +384,7 @@ git remote rm remote-name # 删除远程仓库
 
 ---
 # 撤销操作
->减少非必要，无关提交  
+>减少非必要，无关提交
 减少提交次数
 
 ```sh
@@ -398,7 +399,7 @@ $ git add forgotten_file
 $ git commit --amend
 ```
 
-**上面的三条命令最终只是产生一个提交，第二个提交命令修正了第一个的提交内容。**    
+**上面的三条命令最终只是产生一个提交，第二个提交命令修正了第一个的提交内容。**
 
 # 取消暂存
 
@@ -431,7 +432,7 @@ Changes not staged for commit:
   (use "git checkout -- <file>..." to discard changes in working directory)
 
         modified:   benchmarks.rb
-```        
+```
 这条命令看起来有些古怪，先别管，能用就行。现在 benchmarks.rb 文件又回到了之前已修改未暂存的状态。
 
 # 取消对文件的修改
@@ -457,14 +458,14 @@ Changes to be committed:
         modified:   README.txt
 ```
 
-可以看到，该文件已经恢复到修改前的版本。 **你可能已经意识到了，这条命令有些危险，所有对文件的修改都没有了，因为我们刚刚把之前版本的文件复制过来重写了此文件。所以在用这条命令前，请务必确定真的不再需要保留刚才的修改。如果只是想回退版本，同时保留刚才的修改以便将来继续工作，可以用下章介绍的 stashing 和分支来处理，应该会更好些。**  
+可以看到，该文件已经恢复到修改前的版本。 **你可能已经意识到了，这条命令有些危险，所有对文件的修改都没有了，因为我们刚刚把之前版本的文件复制过来重写了此文件。所以在用这条命令前，请务必确定真的不再需要保留刚才的修改。如果只是想回退版本，同时保留刚才的修改以便将来继续工作，可以用下章介绍的 stashing 和分支来处理，应该会更好些。**
 
 **记住，任何已经提交到 Git 的都可以被恢复。** 即便在已经删除的分支中的提交，或者用 `--amend` 重新改写的提交，都可以被恢复（关于数据恢复的内容见第九章）。所以，你可能失去的数据，仅限于没有提交过的，对 Git 来说它们就像从未存在过一样。
 
 
 ---
 # 忽略某些文件
-一般我们总会有些文件无需纳入 `Git` 的管理，也不希望它们总出现在未跟踪文件列表。通常都是些自动生成的文件，比如日志文件，或者编译过程中创建的临时文件等。我们可以创建一个名为 `.gitignore` 的文件，列出要忽略的文件模式。来看一个实际的例子：    
+一般我们总会有些文件无需纳入 `Git` 的管理，也不希望它们总出现在未跟踪文件列表。通常都是些自动生成的文件，比如日志文件，或者编译过程中创建的临时文件等。我们可以创建一个名为 `.gitignore` 的文件，列出要忽略的文件模式。来看一个实际的例子：
 
 ```sh
 $ cat .gitignore
@@ -472,19 +473,19 @@ $ cat .gitignore
 *~
 ```
 
-第一行告诉 Git 忽略所有以 .o 或 .a 结尾的文件。<!-- 一般这类对象文件和存档文件都是编译过程中出现的，我们用不着跟踪它们的版本。-->   
+第一行告诉 Git 忽略所有以 .o 或 .a 结尾的文件。<!-- 一般这类对象文件和存档文件都是编译过程中出现的，我们用不着跟踪它们的版本。-->
 第二行告诉 Git 忽略所有以波浪符（~）结尾的文件，许多文本编辑软件（比如 Emacs）都用这样的文件名保存副本。<!--此外，你可能还需要忽略 log，tmp 或者 pid 目录，以及自动生成的文档等等。要养成一开始就设置好 .gitignore 文件的习惯，以免将来误提交这类无用的文件。-->
 
 ### **文件 .gitignore 的格式规范如下：**
 
 - 所有空行或者以注释符号 ＃ 开头的行都会被 Git 忽略。
 - 可以使用标准的 glob 模式匹配。
-- **匹配模式最后跟反斜杠（/）说明要忽略的是目录。**  
-- **要忽略指定模式以外的文件或目录，可以在模式前加上惊叹号（!）取反。**   
-- 所谓的 glob 模式是指 shell 所使用的简化了的正则表达式。   
-星号（\*）匹配零个或多个任意字符；  
-[abc] 匹配任何一个列在方括号中的字符（这个例子要么匹配一个 a，要么匹配一个 b，要么匹配一个 c）；  
-问号（?）只匹配一个任意字符；  
+- **匹配模式最后跟反斜杠（/）说明要忽略的是目录。**
+- **要忽略指定模式以外的文件或目录，可以在模式前加上惊叹号（!）取反。**
+- 所谓的 glob 模式是指 shell 所使用的简化了的正则表达式。
+星号（\*）匹配零个或多个任意字符；
+[abc] 匹配任何一个列在方括号中的字符（这个例子要么匹配一个 a，要么匹配一个 b，要么匹配一个 c）；
+问号（?）只匹配一个任意字符；
 如果在方括号中使用短划线分隔两个字符，表示所有在这两个字符范围内的都可以匹配（比如 [0-9] 表示匹配所有 0 到 9 的数字）。
 
 我们再看一个 .gitignore 文件的例子：
