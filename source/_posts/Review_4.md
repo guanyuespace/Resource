@@ -1,15 +1,17 @@
 ---
 title: Review
-date: 2019-05-21 09:03:58
+date: 2019-06-11 12:04:48
 categories:
 - Life
 - Study
-tag:
+tags:
 - thinking
 ---
 # Review
 
 what's the date today?
-![](date.jpg "99天了")
+![](date.png "120天了")
 
+
+<!-- it's time to leave. -->
 <!-- 准备... ... -->
