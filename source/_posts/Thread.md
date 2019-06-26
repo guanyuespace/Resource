@@ -95,13 +95,13 @@ public class Thread implements Runnable {
 
     private native void resume0();//resume() has been Deprecated
     private native void suspend0();//suspend() has been Deprecated
-    // others ......  
+    // others ......
 }
 ```
 <!-- Later ... ... -->
 
 ### sleep & yield
-[参考](https://www.jianshu.com/p/0964124ae822)   
+[参考](https://www.jianshu.com/p/0964124ae822)
 <!-- jvm.cpp 理解... ... 操作？？？ -->
 
 ### wait
@@ -187,4 +187,6 @@ class Consumer extends Thread {
 }
 ```
 
-ok,
+# BlockingQueue
+
+# ThreadExecutorPool
