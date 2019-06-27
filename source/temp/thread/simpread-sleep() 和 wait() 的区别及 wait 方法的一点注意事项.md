@@ -42,12 +42,13 @@ wait、notify 和 notifyAll 方法只能在同步方法或者同步代码块中�
 
 [![](http://common.cnblogs.com/images/copycode.gif)](javascript:void(0); "复制代码")
 
-<pre>class Printer {
+```java
+class Printer {
     private int flag = 1;
     public void print1() throws Exception {
         synchronized(this) {
             while(flag != 1) {
-                this.wait();    
+                this.wait();
             }
             System.out.print("1");
             System.out.print("2");
@@ -87,22 +88,19 @@ wait、notify 和 notifyAll 方法只能在同步方法或者同步代码块中�
         }
     }
 }
-</pre>
+```
 
-[![](http://common.cnblogs.com/images/copycode.gif)](javascript:void(0); "复制代码")
 
 注意事项：
 
-1\. 调用 wait 方法和 notify、notifyAll 方法前必须获得对象锁，也就是必须写在 synchronized(锁对象){......} 代码块中。
+1. 调用 wait 方法和 notify、notifyAll 方法前必须获得对象锁，也就是必须写在 synchronized(锁对象){......} 代码块中。
 
-2\. 当线程 print1 调用了 wait 方法后就释放了对象锁，否则其他线程无法获得对象锁，也就无法唤醒线程 print1。
+2. 当线程 print1 调用了 wait 方法后就释放了对象锁，否则其他线程无法获得对象锁，也就无法唤醒线程 print1。
 
-3\. 当 this.wait() 方法返回后，线程必须再次获得对象锁后才能继续执行。
+3. 当 this.wait() 方法返回后，线程必须再次获得对象锁后才能继续执行。
 
-4\. 如果另外两个线程都在 wait，则正在执行的线程调用 notify 方法只能唤醒一个正在 wait 的线程（公平竞争，由 JVM 决定）。
+4. 如果另外两个线程都在 wait，则正在执行的线程调用 notify 方法只能唤醒一个正在 wait 的线程（公平竞争，由 JVM 决定）。
 
-5\. 当使用 notifyAll 方法后，所有 wait 状态的线程都会被唤醒，但是只有一个线程能获得锁对象，必须执行完 while(condition){this.wait();} 后才能获得对象锁。其余的需要等待该获得对象锁的线程执行完释放对象锁后才能继续执行。
+5. 当使用 notifyAll 方法后，所有 wait 状态的线程都会被唤醒，但是只有一个线程能获得锁对象，必须执行完 while(condition){this.wait();} 后才能获得对象锁。其余的需要等待该获得对象锁的线程执行完释放对象锁后才能继续执行。
 
-6\. 当某个线程调用 notifyAll 方法后，虽然其他线程被唤醒了，但是该线程依然持有着对象锁，必须等该同步代码块执行完（右大括号结束）后才算正式释放了锁对象，另外两个线程才有机会执行。
-
-<sr-plugin-count>共计：3712 个字符，汉字：1594，段落：47，英文单词：253，阅读进度：<sr-plugin-count-process>100</sr-plugin-count-process>%，阅读时间：<sr-plugin-count-time>41分45秒</sr-plugin-count-time></sr-plugin-count>
+6. 当某个线程调用 notifyAll 方法后，虽然其他线程被唤醒了，但是该线程依然持有着对象锁，必须等该同步代码块执行完（右大括号结束）后才算正式释放了锁对象，另外两个线程才有机会执行。

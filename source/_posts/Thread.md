@@ -90,6 +90,7 @@ public class Thread implements Runnable {
         }
     }
     ///////////////native methods////////////////////////////
+    public final native void wait(long timeout) throws InterruptedException;
     public static native void sleep(long millis) throws InterruptedException;
     public static native void yield();
 
@@ -98,11 +99,21 @@ public class Thread implements Runnable {
     // others ......
 }
 ```
-<!-- Later ... ... -->
+
+由代码可知join的内部实现由wait(mills)实现
+wait(),sleep(),yield()均由C/C++代码（JNI）实现
+
+
+
 
 ### sleep & yield
-[参考](https://www.jianshu.com/p/0964124ae822)
+>[yield与sleep源码解析](https://guanyuespace.github.io/temp/thread/simpread-Java%20%E7%BA%BF%E7%A8%8B%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B9%8B%20yield%20%E5%92%8C%20sleep.html)
+>[Java 线程源码解析之 yield 和 sleep](https://www.jianshu.com/p/0964124ae822)
+
 <!-- jvm.cpp 理解... ... 操作？？？ -->
+由于 `Thread` 的 `yield` 和 `sleep` 有一定的相似性，因此放在一起进行分析。`yield` 会释放 CPU 资源，~~让优先级更高（至少是相同）的线程获得执行机会；~~ `sleep` 当传入参数为 0 时，和 `yield` 相同；当传入参数大于 0 时，也是释放 CPU 资源，但可以让其它任何优先级的线程获得执行机会；
+
+基于优先级的调度程序使用一种有优先权的方式实现，这意味着当一个有更高优先权的线程到来时，无论低优先级的线程是否在运行，都会中断 (抢占) 它。这个约定对于操作系统来说并不总是这样，*这意味着操作系统有时可能会选择运行一个更低优先级的线程。*
 
 ### wait
 
@@ -177,16 +188,34 @@ class Consumer extends Thread {
 
     synchronized void myJoin() throws InterruptedException {
         System.out.println(this.getClass());
-        System.out.println("my join start");
+        System.out.println("current thread: " + Thread.currentThread().getName() + "\t my join start");
         while (this.isAlive()) {
-            System.out.println("current thread: "+Thread.currentThread().getName());
-            wait(0);//释放consumer.this的锁对象, main-thread wait(0)  here ... ... , consumer子线程获取所对象执行, 当consumer子线程退出后自动唤醒main
+            System.out.println("current thread: " + Thread.currentThread().getName());
+            wait(0);//释放consumer.this的锁对象, main stop here ... ... , consumer子线程获取所对象执行, 当consumer子线程退出后自动唤醒main
         }
-        System.out.println("my join end");
+        System.out.println("current thread: " + Thread.currentThread().getName() + "\t my join end");
     }
 }
 ```
 
+**Result：**
+
+```
+consumer start
+start sleep 2000
+consumer end
+class thread.Consumer
+current thread: main	 my join start
+current thread: main
+current thread: main	 my join end
+main end
+producer start
+producer end
+```
+
 # BlockingQueue
+>。。。
+
+
 
 # ThreadExecutorPool

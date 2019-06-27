@@ -1,4 +1,5 @@
-> 本文由 [简悦 SimpRead](http://ksria.com/simpread/) 转码， 原文地址 https://www.jianshu.com/p/0964124ae822
+# yield与sleep源码解析
+> [原文地址](https://www.jianshu.com/p/0964124ae822)
 
 # 概述
 
@@ -36,7 +37,7 @@ void os::yield() {
 
 ```
 
-## sleep
+# sleep
 
 Thread.sleep 最终调用 JVM_Sleep 方法：
 
@@ -52,7 +53,7 @@ JVM_ENTRY(void, JVM_Sleep(JNIEnv* env, jclass threadClass, jlong millis))
   if (Thread::is_interrupted (THREAD, true) && !HAS_PENDING_EXCEPTION) {
     THROW_MSG(vmSymbols::java_lang_InterruptedException(), "sleep interrupted");
   }
- //设置线程状态为SLEEPING
+  //设置线程状态为SLEEPING
   JavaThreadSleepState jtss(thread);
 
   EventThreadSleep event;
@@ -172,32 +173,30 @@ int os::sleep(Thread* thread, jlong millis, bool interruptible) {
 
 通过阅读源码知道，原来 sleep 是通过 pthread_cond_timedwait 实现的，那么为什么不通过 linux 的 sleep 实现呢？
 
-*   pthread_cond_timedwait 既可以堵塞在某个条件变量上，也可以设置超时时间；
-*   sleep 不能及时唤醒线程, 最小精度为秒；
+- pthread_cond_timedwait 既可以堵塞在某个条件变量上，也可以设置超时时间；
+- sleep 不能及时唤醒线程, 最小精度为秒；
 
 可以看出 pthread_cond_timedwait 使用灵活，而且时间精度更高；
 
-＃ 例子
+## 例子
 通过 strace 可以查看代码的系统调用情况，建立两个类，一个调用 Thread.sleep(), 一个调用 Thread.yield(), 查看其系统调用情况:
 
-*   Thread.sleep(0)
+### Thread.sleep(0)
 
 ```cpp
 Thread.sleep(0);
 System.out.println("hello");
-
 ```
 
 ![](http://upload-images.jianshu.io/upload_images/2592685-2a84bc0961dafbbe.png) sleep0.png
 
 可以看到 sched_yield 的系统调用
 
-*   Thread.sleep(nonzero)
+### Thread.sleep(nonzero)
 
 ```cpp
 Thread.sleep(1000);
 System.out.println("hello");
-
 ```
 
 ![](http://upload-images.jianshu.io/upload_images/2592685-0ffa149115b2ab35.png) sleep2.png
@@ -211,14 +210,12 @@ System.out.println("hello");
 // NPTL or LinuxThreads?
   static bool is_LinuxThreads()               { return !_is_NPTL; }
   static bool is_NPTL()                       { return _is_NPTL;  }
-
 ```
 
 可以通过如下命令查看到底是使用哪种线程实现:
 
 ```cpp
 getconf GNU_LIBPTHREAD_VERSION
-
 ```
 
 ![](http://upload-images.jianshu.io/upload_images/2592685-5dbef871d6a7adb0.png) nptl.png
@@ -294,12 +291,11 @@ void os::Linux::libpthread_init() {
 
 ```
 
-*   Thread.yield
+### Thread.yield
 
 ```cpp
 Thread.yield();
 System.out.println("hello");
-
 ```
 
 ![](http://upload-images.jianshu.io/upload_images/2592685-613fc525333ad775.png) Paste_Image.png

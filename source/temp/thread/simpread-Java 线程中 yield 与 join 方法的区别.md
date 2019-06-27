@@ -1,12 +1,12 @@
 >翻译自 [How To Do In Java](http://howtodoinjava.com/2014/06/03/difference-between-yield-and-join-in-threads-in-java/)。欢迎加入[翻译小组](http://group.jobbole.com/category/feedback/trans-team/)。转载请见文末要求。
 
-### **Java 线程调度的一点背景**
+### Java 线程调度的一点背景
 
 在各种各样的线程中，Java 虚拟机必须实现一个有优先权的、基于优先级的调度程序。这意味着 Java 程序中的每一个线程被分配到一定的优先权，使用定义好的范围内的一个正整数表示。优先级可以被开发者改变。即使线程已经运行了一定时间，Java 虚拟机也不会改变其优先级
 
 优先级的值很重要，因为 Java 虚拟机和下层的操作系统之间的约定是操作系统必须选择有最高优先权的 Java 线程运行。所以我们说 Java 实现了一个[基于优先权的调度程序](http://en.wikipedia.org/wiki/Fixed-priority_pre-emptive_scheduling)。该调度程序使用一种有优先权的方式实现，这意味着当一个有更高优先权的线程到来时，无论低优先级的线程是否在运行，都会中断 (抢占) 它。这个约定对于操作系统来说并不总是这样，这意味着操作系统有时可能会选择运行一个更低优先级的线程。(我憎恨多线程的这一点，因为这不能保证任何事情)
 
-> **注意**      
+> **注意**
 >Java并不限定线程是以时间片运行，但是大多数操作系统却有这样的要求。在术语中经常引起混淆：抢占经常与时间片混淆。事实上，抢占意味着只有拥有高优先级的线程可以优先于低优先级的线程执行，但是当线程拥有相同优先级的时候，他们不能相互抢占。它们通常受时间片管制，但这并不是 Java 的要求。
 
 ### **理解线程的优先权**
@@ -24,18 +24,18 @@
 
 现在，当我们对线程调度和线程优先级有一定理解后，让我们进入主题。
 
-### **yield() 方法**   
+### **yield() 方法**
 
-理论上，yield 意味着放手，放弃，投降。   
-一个调用 yield() 方法的线程告诉虚拟机它乐意让其他线程占用自己的位置。这表明该线程没有在做一些紧急的事情。   
+理论上，yield 意味着放手，放弃，投降。
+一个调用 yield() 方法的线程告诉虚拟机它乐意让其他线程占用自己的位置。这表明该线程没有在做一些紧急的事情。
 注意，这仅是一个暗示，并不能保证不会产生任何影响。
 
 在 Thread.java 中 yield() 定义如下：
 
 ```java
 /**
- * A hint to the scheduler that the current thread is willing to yield its current use of a processor. 
- * The scheduler is free to ignore this hint. 
+ * A hint to the scheduler that the current thread is willing to yield its current use of a processor.
+ * The scheduler is free to ignore this hint.
  * Yield is a heuristic attempt to improve relative progression between threads that would otherwise over-utilize a CPU.
  * Its use should be combined with detailed profiling and benchmarking to ensure that it actually has the desired effect.
  */
@@ -81,7 +81,7 @@ class Consumer extends Thread{
             Thread.yield();
         }
     }
-} 
+}
 ```
 
 #### **上述程序在没有调用 yield() 方法情况下的输出：**
@@ -96,7 +96,7 @@ I am Producer : Produced Item 0
 I am Producer : Produced Item 1
 I am Producer : Produced Item 2
 I am Producer : Produced Item 3
-I am Producer : Produced Item 4 
+I am Producer : Produced Item 4
 ```
 
 #### **上述程序在调用 yield() 方法情况下的输出：**
@@ -111,7 +111,7 @@ I am Consumer : Consumed Item 2
 I am Producer : Produced Item 3
 I am Consumer : Consumed Item 3
 I am Producer : Produced Item 4
-I am Consumer : Consumed Item 4 
+I am Consumer : Consumed Item 4
 ```
 
 ### **join() 方法**
@@ -146,13 +146,13 @@ public class JoinExample{
                 System.out.println("First task completed");
             }
         });
-        
+
         Thread t1 = new Thread(new Runnable(){
             public void run(){
                 System.out.println("Second task completed");
             }
         });
-        
+
         t.start(); // Line 15
         t.join();  // Line 16
         t1.start();
@@ -165,22 +165,21 @@ Output: 
 First task started
 Sleeping for 2 seconds
 First task completed
-Second task completed 
+Second task completed
 ```
 
 这是一些很小却很重要的概念。在评论部分让我知道你的想法。
 
-原文链接：
+### 原文链接
 [How To Do In Java](http://howtodoinjava.com/2014/06/03/difference-between-yield-and-join-in-threads-in-java/)
 
-翻译：
+### 翻译
 [ImportNew.com](http://www.importnew.com)
-
--
 
 [Calarence](http://www.importnew.com/author/calarencce)
 
-译文链接：[http://www.importnew.com/14958.html](http://www.importnew.com/14958.html)
+[译文链接](http://www.importnew.com/14958.html)
 
 
-### 关于作者： [Calarence](http://www.importnew.com/author/calarencce)
+### 关于作者
+[Calarence](http://www.importnew.com/author/calarencce)
