@@ -2,7 +2,12 @@
 title: Thread
 date: 2019-03-11 13:37:31
 categories:
+- Java
+- SourceCode
+- Thread
 tags:
+- Java
+- Thread
 ---
 # Thread
 ```java
@@ -575,4 +580,55 @@ public class PriorityBlockingQueue<E> extends AbstractQueue<E>
 
 <!-- Later -->
 
-# ThreadExecutorPool
+
+# CountDownLatch
+>完成先决条件latch.countdown()后并行执行latch.await()下的线程
+
+latch.countdown() can be called in child-thread.
+
+```java
+/**
+* Decrements the count of the latch, releasing all waiting threads if
+* the count reaches zero.
+*
+* <p>If the current count is greater than zero then it is decremented.
+* If the new count is zero then all waiting threads are re-enabled for
+* thread scheduling purposes.
+*
+* <p>If the current count equals zero then nothing happens.
+*/
+public void countDown() {
+  sync.releaseShared(1);//private final Sync sync;
+}
+/**
+ * Implements interruptible condition wait.
+ * <ol>
+ * <li> If current thread is interrupted, throw InterruptedException.
+ * <li> Save lock state returned by {@link #getState}.
+ * <li> Invoke {@link #release} with saved state as argument,
+ *      throwing IllegalMonitorStateException if it fails.
+ * <li> Block until signalled or interrupted.
+ * <li> Reacquire by invoking specialized version of
+ *      {@link #acquire} with saved state as argument.
+ * <li> If interrupted while blocked in step 4, throw InterruptedException.
+ * </ol>
+ */
+public final void await() throws InterruptedException {
+    if (Thread.interrupted())
+        throw new InterruptedException();
+    Node node = addConditionWaiter();
+    int savedState = fullyRelease(node);
+    int interruptMode = 0;
+    while (!isOnSyncQueue(node)) {
+        LockSupport.park(this);
+        if ((interruptMode = checkInterruptWhileWaiting(node)) != 0)
+            break;
+    }
+    if (acquireQueued(node, savedState) && interruptMode != THROW_IE)
+        interruptMode = REINTERRUPT;
+    if (node.nextWaiter != null) // clean up if cancelled
+        unlinkCancelledWaiters();
+    if (interruptMode != 0)
+        reportInterruptAfterWait(interruptMode);
+}
+```
