@@ -1,4 +1,4 @@
-> 本文由 [简悦 SimpRead](http://ksria.com/simpread/) 转码， 原文地址 https://segmentfault.com/a/1190000004417830
+> [原文地址](https://segmentfault.com/a/1190000004417830)
 
 > Java 语言特性系列
 
@@ -10,7 +10,7 @@
 - [Java10 的新特性](https://segmentfault.com/a/1190000014076481)
 - [Java11 的新特性](https://segmentfault.com/a/1190000016527932)
 - [Java12 的新特性](https://segmentfault.com/a/1190000018588495)
-- <a>Java13 的新特性</a>
+- Java13 的新特性
 
 ## 序
 
@@ -141,6 +141,8 @@ public class CustomResource  implements AutoCloseable {
 }
 ```
 
+---
+
 ### 5、JSR203-More New I/O APIs for the Java Platform(`新规范`)
 
 ####  bytebuffer
@@ -221,6 +223,8 @@ public class ByteBufferUsage {
     }
 }
 ```
+
+---
 
 ### 6、JSR292 与 InvokeDynamic
 >与反射之间的关系：
@@ -452,6 +456,8 @@ public class UseSQLData {
 }
 ```
 
+---
+
 ### 8、Path 接口 (`重要接口更新`)
 
 ```java
@@ -556,7 +562,10 @@ public class FilesUtils {
 }
 ```
 
+---
+
 ### 12、jcmd utility
+>命令：jcmd, javap ...使用。。。
 
 jcmd 是为了替代 jps 出现了，包含了 jps 的大部分功能并新增了一些新的功能。
 
@@ -867,11 +876,13 @@ sun.zip.zipFile.openTime=72163038
 sun.zip.zipFiles=3838
 ```
 
-### 13、fork/join
+### **13、fork/join**
+>拆分成子任务，框架。。。
 
 Java7 提供的一个用于并行执行任务的框架，是一个把大任务分割成若干个小任务，最终汇总每个小任务结果后得到大任务结果的框架。
 
 ### 14、Java Mission Control
+<!-- what's the meaning ? -->
 
 在 JDK7u40 里头提供了 Java Mission Control，这个是从 JRockit 虚拟机里头迁移过来的类似 JVisualVm 的东东。
 
