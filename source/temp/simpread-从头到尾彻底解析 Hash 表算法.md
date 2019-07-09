@@ -1,6 +1,7 @@
-> 本文由 [简悦 SimpRead](http://ksria.com/simpread/) 转码， 原文地址 https://www.cnblogs.com/baimt/p/5299807.html
+# 从头到尾彻底解析 Hash 表算法
+>[原文地址](https://www.cnblogs.com/baimt/p/5299807.html)
 
-# [从头到尾彻底解析 Hash 表算法](http://kb.cnblogs.com/page/189480/)
+[从头到尾彻底解析 Hash 表算法](http://kb.cnblogs.com/page/189480/)
 
 
 　　说明：本文分为三部分内容， 第一部分为一道百度面试题 Top K 算法的详解；第二部分为关于 Hash 表算法的详细阐述；第三部分为打造一个最快的 Hash 表算法。
