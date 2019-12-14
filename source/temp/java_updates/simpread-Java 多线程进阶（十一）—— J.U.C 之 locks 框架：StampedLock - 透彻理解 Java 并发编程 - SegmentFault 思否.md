@@ -1,4 +1,5 @@
 # StampedLock分析
+> 
 > [原文地址](https://segmentfault.com/a/1190000015808032?utm_source=tag-newest)
 > 本文首发于一世流云的专栏：[https://segmentfault.com/blog...](https://segmentfault.com/blog/ressmix_multithread)
 

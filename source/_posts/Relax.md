@@ -17,3 +17,17 @@ tags:
 <!-- more -->
 {% asset_img bd_logo.png just for fun ! %}  
 ![just for fun](bd_logo.png "just for fun !")  
+
+
+
+<!--
+## CSDN注脚
+一个具有注脚的文本。[^2]
+
+[^2]: 注脚的解释
+
+## CSDN注释
+Markdown将文本转换为 HTML。
+
+*[HTML]:   超文本标记语言
+-->

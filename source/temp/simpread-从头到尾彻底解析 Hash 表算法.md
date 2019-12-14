@@ -1,5 +1,5 @@
 # 从头到尾彻底解析 Hash 表算法
->[原文地址](https://www.cnblogs.com/baimt/p/5299807.html)
+> [原文地址](https://www.cnblogs.com/baimt/p/5299807.html)
 
 [从头到尾彻底解析 Hash 表算法](http://kb.cnblogs.com/page/189480/)
 
