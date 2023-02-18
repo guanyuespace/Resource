@@ -158,9 +158,14 @@ Unsafe unsafe = getUnsafe();
 final String s = "abc";
 String s1 = "abc";
 
-System.out.println(s==s1);//true
-//获取s的实例变量value
-Field valueInString = String.class.getDeclaredField("value");
+//获取s1的实例变量value
+Field valueInString;
+try {
+    valueInString = String.class.getDeclaredField("value");
+} catch (NoSuchFieldException e) {
+    throw new RuntimeException(e);
+}
+
 //获取value的变量偏移值
 long offset = unsafe.objectFieldOffset(valueInString);
 //value本身是一个char[],要修改它元素的值，仍要获取baseOffset和indexScale
@@ -173,24 +178,38 @@ char[] values = (char[]) unsafe.getObject(s, offset);
 //为value赋值
 unsafe.putChar(values, base + scale * 2, 'd');
 
-System.out.println("s:" + s + " s1:" + s1);
+System.out.printf("s:%s s1:%s  s.equals(s1):%b\n", s, s1, s.equals(s1));
 
-//将s的值改为 abc
-s1="abc";
+System.out.println("s:" + s);
+System.out.printf("s:%s\n", s);
+
 String s2 = "abc";
 String s3 = new String("abc");
-System.out.println(s==s1);
-System.out.println(s.equals(s1));
 System.out.println("s:" + s + " s1:" + s1 + "  s2:" + s2 + "  s3:" + s3);
+System.out.printf("s:%s s1:%s  s2:%s s3:%s\n", s, s1, s2, s3);
+System.out.println("abc");
 ```
 结果：
+
 ```java
-true
-s:abc s1:abd
-true
-true
+s:abd s1:abd  s.equals(s1):true
+s:abc
+s:abd
 s:abc s1:abd  s2:abd  s3:abd
+s:abd s1:abd  s2:abd s3:abd
+abd
 ```
+
+查看字节码文件：
+```java
+System.out.println("s:abc s1:" + s1 + "  s2:" + s2 + "  s3:" + s3);
+System.out.printf("s:%s s1:%s  s2:%s s3:%s\n", "abc", s1, s2, s3);
+System.out.println("abc");
+```
+
+System.out.println  `final` 常量已经被替换为 *abc*
+System.out.printf   通过引用关联到String类维护的字符串池...
+
 
 
 ---
